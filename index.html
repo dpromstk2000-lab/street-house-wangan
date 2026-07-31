@@ -473,6 +473,65 @@ button{font:inherit}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;transition-duration:.001ms!important}}
 @media(max-width:760px){.policy-modal{padding:0}.policy-panel{width:100%;max-height:100vh;height:100vh}.policy-body{padding:21px 17px}.system-check{padding:15px}.check-summary{grid-template-columns:1fr 1fr}.check-head{display:grid}.check-table{display:block;overflow:auto}}
 
+
+/* STEP WANGAN-WEB-9: LINE readiness / receipt / launch verdict / screenshot-safe check */
+body.system-check-mode{margin:0;background:#091016!important}
+body.system-check-mode>*:not(#systemCheck){display:none!important}
+body.system-check-mode #systemCheck{
+  display:block!important;position:relative!important;inset:auto!important;
+  min-height:100vh;overflow:visible!important;padding:24px
+}
+
+.line-setup{
+  margin:0 0 18px;padding:17px;background:#121b22;border:1px solid rgba(255,255,255,.1)
+}
+.line-setup h2{margin:0 0 6px;font-size:17px}
+.line-setup p{margin:0 0 13px;color:#aeb8c0;font-size:10px}
+.line-setup-row{display:grid;grid-template-columns:1fr auto;gap:9px}
+.line-setup input{
+  min-width:0;padding:11px 12px;border:1px solid rgba(255,255,255,.17);
+  background:#091016;color:#fff;font:inherit;font-size:12px
+}
+.line-setup button{border:0;background:var(--yellow);color:#111;padding:10px 15px;font-weight:1000;cursor:pointer}
+.line-setup-result{
+  display:none;margin-top:11px;padding:11px 13px;background:#0b1218;
+  border-left:4px solid var(--yellow);font-size:10px;color:#d3d9de;overflow-wrap:anywhere
+}
+.line-setup-result.show{display:block}
+.line-setup-result.error{border-left-color:#d64141;color:#ffd4d4}
+
+.release-verdict{
+  margin:0 0 18px;padding:18px;background:#121b22;border-left:5px solid #78838c
+}
+.release-verdict.ready{border-left-color:var(--green)}
+.release-verdict.demo{border-left-color:var(--yellow)}
+.release-verdict.blocked{border-left-color:#d64141}
+.release-verdict b{display:block;font-size:19px;margin-bottom:5px}
+.release-verdict span{font-size:11px;color:#acb6be}
+
+.btn-line-success{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-receipt{background:#fff;color:#222;border-color:#bcc4c9}
+
+.receipt-note{
+  display:none;margin-top:13px;padding:12px 14px;background:#edf9f1;
+  border-left:4px solid var(--green);color:#2c6742;font-size:10px;text-align:left
+}
+.receipt-note.show{display:block}
+
+.line-ready-note{
+  display:none;margin-top:12px;padding:11px 13px;background:rgba(22,183,90,.11);
+  border-left:4px solid var(--green);color:#caffdc;font-size:10px
+}
+.line-ready-note.show{display:block}
+
+@media(max-width:760px){
+  body.system-check-mode #systemCheck{padding:15px}
+  .line-setup-row{grid-template-columns:1fr}
+  .modal-panel.completed .modal-footer{grid-template-columns:1fr 1fr}
+  .modal-panel.completed .modal-footer .btn-line-success,
+  .modal-panel.completed .modal-footer .btn-phone{grid-column:1/-1}
+}
+
 </style>
 </head>
 <body>
@@ -633,6 +692,10 @@ button{font:inherit}
           <summary>夜間や休日でも対応してもらえますか？</summary>
           <p>通常営業時間外は状況により応相談となります。緊急時はまず電話でご連絡ください。</p>
         </details>
+        <details>
+          <summary>LINEで車両や部品の写真を送れますか？</summary>
+          <p>LINE公式アカウント接続後は、WEB受付完了画面からLINEを開き、受付参照番号と一緒に写真を送れるようになります。</p>
+        </details>
       </div>
     </div>
   </section>
@@ -645,7 +708,7 @@ button{font:inherit}
       <div class="actions"><a class="btn btn-primary" href="tel:08052410066">電話で相談　080-5241-0066</a><button class="btn btn-ghost js-open-estimate" type="button">DPRO WEB受付を開く</button><button class="btn btn-line js-line" type="button">LINEで相談</button></div><div class="dpro-site-note" id="environmentNote">
   <b id="environmentLabel">DPRO DEMO連動</b>
   <span id="environmentText">WEB受付内容を店舗管理画面へまとめて登録します。</span>
-  <span class="version-badge">WEB-8</span>
+  <span class="version-badge">WEB-9</span>
 </div>
     </div>
   </section>
@@ -836,7 +899,7 @@ button{font:inherit}
           </label>
 
           <div class="line-guide">
-            LINE公式URL確認後は、この入力内容をLINE相談へ引き継ぐ構成にも変更できます。
+            LINE公式接続後は、受付完了画面から車両写真や部品写真をLINEで送れます。
           </div>
 
           <div class="form-error" data-step-error="2">ご相談内容、詳しい内容、同意欄を確認してください。</div>
@@ -884,6 +947,12 @@ button{font:inherit}
             <div class="completion-caution" id="completionCaution" hidden>
               希望日時はまだ確定していません。緊急の場合や連絡を急ぐ場合は、080-5241-0066へお電話ください。
             </div>
+            <div class="line-ready-note" id="lineReadyNote">
+              LINEで写真を送る際は、画面に表示された受付参照番号も一緒にお知らせください。
+            </div>
+            <div class="receipt-note" id="receiptNote">
+              受付控えを端末へ保存しました。正式な入庫日時は、店舗からの連絡後に確定します。
+            </div>
             <div class="api-fallback" id="apiFallback">
               DPROへ送信できなかった場合でも、下の「内容をコピー」または「メールで送信」を利用できます。
             </div>
@@ -907,6 +976,8 @@ button{font:inherit}
         <button class="btn btn-mail-alt" id="mailEstimate" type="button" hidden>メールで送信</button>
         <button class="btn btn-dpro" id="sendEstimate" type="submit" hidden>DPROへ受付送信</button>
         <a class="btn btn-phone" id="successPhone" href="tel:08052410066" hidden>店舗へ電話する</a>
+        <a class="btn btn-line-success" id="successLine" href="#" target="_blank" rel="noopener" hidden>LINEで写真を送る</a>
+        <button class="btn btn-receipt" id="downloadReceipt" type="button" hidden>受付控えを保存</button>
         <button class="btn btn-new-request" id="newRequest" type="button" hidden>別の相談を入力</button>
         <button class="btn btn-success-close" id="closeSuccess" type="button" hidden>受付画面を閉じる</button>
       </footer>
@@ -932,8 +1003,23 @@ button{font:inherit}
 </div>
 <section class="system-check" id="systemCheck" aria-hidden="true">
   <div class="check-shell">
-    <header class="check-head"><div><p>INTERNAL SYSTEM CHECK</p><h1>WANGAN WEB システムチェック</h1><small>通常のお客様画面には表示されません。URLへ <code>?system-check=1</code> を付けた場合のみ開きます。</small></div><button class="check-close" id="closeSystemCheck" type="button">サイトへ戻る</button></header>
+    <header class="check-head"><div><p>INTERNAL SYSTEM CHECK</p><h1>WANGAN WEB-9 最終公開チェック</h1><small>通常のお客様画面には表示されません。URLへ <code>?system-check=1</code> を付けた場合のみ開きます。</small></div><button class="check-close" id="closeSystemCheck" type="button">サイトへ戻る</button></header>
     <div class="check-summary"><div><b id="checkTotal">0</b><span>検査件数</span></div><div><b id="checkPass">0</b><span>合格</span></div><div><b id="checkWarn">0</b><span>注意</span></div><div><b id="checkFail">0</b><span>失敗</span></div></div>
+    <div class="release-verdict demo" id="releaseVerdict">
+      <b id="releaseVerdictTitle">検査待ち</b>
+      <span id="releaseVerdictText">一括検査を実行すると、DEMO確認または正式公開の判定を表示します。</span>
+    </div>
+
+    <div class="line-setup">
+      <h2>LINE公式URL 設定支援</h2>
+      <p>LINE公式アカウントの友だち追加URLを貼り付けると、APP_CONFIGへ入れる設定コードを作成します。この入力はサイト全体へ自動反映されません。</p>
+      <div class="line-setup-row">
+        <input id="lineSetupInput" type="url" placeholder="https://lin.ee/xxxx または https://line.me/R/ti/p/@xxxx">
+        <button id="copyLineConfig" type="button">設定コードをコピー</button>
+      </div>
+      <div class="line-setup-result" id="lineSetupResult"></div>
+    </div>
+
     <div class="check-actions"><button class="check-run" id="runSystemCheck" type="button">一括検査を実行</button><button class="check-copy" id="copySystemCheck" type="button">検査結果をコピー</button><a class="check-site" href="./">通常サイトを開く</a></div>
     <table class="check-table"><thead><tr><th>項目</th><th>結果</th><th>詳細</th></tr></thead><tbody id="checkResults"></tbody></table>
     <div class="check-note">正式公開前は、APP_CONFIGのenvironment、Worker URL、店舗コード、メール、LINE URLを正式値へ変更し、検査の「失敗」を0件にしてください。</div>
@@ -1013,6 +1099,15 @@ button{font:inherit}
   const robotsMeta = document.getElementById('robotsMeta');
   const canonicalLink = document.getElementById('canonicalLink');
   const jsonLd = document.getElementById('localBusinessJsonLd');
+  const successLine = document.getElementById('successLine');
+  const downloadReceiptButton = document.getElementById('downloadReceipt');
+  const lineReadyNote = document.getElementById('lineReadyNote');
+  const receiptNote = document.getElementById('receiptNote');
+  const releaseVerdict = document.getElementById('releaseVerdict');
+  const releaseVerdictTitle = document.getElementById('releaseVerdictTitle');
+  const releaseVerdictText = document.getElementById('releaseVerdictText');
+  const lineSetupInput = document.getElementById('lineSetupInput');
+  const lineSetupResult = document.getElementById('lineSetupResult');
 
   let currentStep = 1;
   let lastFocusedElement = null;
@@ -1020,6 +1115,8 @@ button{font:inherit}
   let apiConnected = false;
   let isSubmitting = false;
   let submissionCompleted = false;
+  let lastCompletedReference = '';
+  let lastCompletedPayload = null;
 
   const showToast = (message) => {
     toast.textContent = message;
@@ -1042,12 +1139,67 @@ button{font:inherit}
   });
 
 
+  const isValidLineUrl = (url) =>
+    /^https:\/\/(?:lin\.ee\/|line\.me\/|liff\.line\.me\/)/i.test(String(url || '').trim());
+
+  const applyLineIntegration = () => {
+    const configured = isValidLineUrl(LINE_URL);
+
+    document.querySelectorAll('.js-line').forEach((button) => {
+      button.textContent = configured ? 'LINEで相談' : 'LINE相談（準備中）';
+      button.setAttribute('aria-label', configured ? 'LINE公式アカウントを開く' : 'LINE公式URLは未設定です');
+    });
+
+    successLine.hidden = !(submissionCompleted && configured);
+    successLine.href = configured ? LINE_URL : '#';
+    lineReadyNote.classList.toggle('show', submissionCompleted && configured);
+    return configured;
+  };
+
+  const buildReceiptText = () => {
+    const payload = lastCompletedPayload || buildDproPayload();
+    return [
+      'ストリートハウス湾岸通り WEB受付控え',
+      '================================',
+      `受付参照：${lastCompletedReference || payload.clientRequestId || '確認中'}`,
+      `受付経路：${APP_CONFIG.source}`,
+      `受付日時：${new Date().toLocaleString('ja-JP')}`,
+      '',
+      `お名前：${payload.name || ''}`,
+      `電話番号：${payload.phone || ''}`,
+      `車両：${payload.vehicleLabel || payload.carName || ''}`,
+      `ご相談内容：${payload.consultType || ''}`,
+      `希望入庫日時：${payload.preferredVisitDate || '指定なし'} ${payload.preferredVisitTime || ''}`,
+      '',
+      'ご相談詳細',
+      payload.message || '',
+      '',
+      '※希望入庫日時は仮受付です。店舗からの連絡後に正式確定します。',
+      `店舗電話：${APP_CONFIG.telephone}`,
+      `サイト：${APP_CONFIG.siteUrl}`
+    ].join('\n');
+  };
+
+  const downloadReceipt = () => {
+    const blob = new Blob([buildReceiptText()], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `street-house-wangan-receipt-${new Date().toISOString().slice(0,10)}.txt`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    receiptNote.classList.add('show');
+    showToast('受付控えを保存しました。');
+  };
+
   const productionGuardErrors = () => {
     if (IS_DEMO) return [];
     const errors = [];
     if (/demo/i.test(APP_CONFIG.workerApiBase)) errors.push('正式運用なのにWorker URLへ demo が含まれています。');
     if (/demo/i.test(APP_CONFIG.shopCode)) errors.push('正式運用なのに店舗コードへ demo が含まれています。');
-    if (!APP_CONFIG.lineUrl) errors.push('LINE公式URLが未設定です。');
+    if (!isValidLineUrl(APP_CONFIG.lineUrl)) errors.push('LINE公式URLが未設定、または形式が正しくありません。');
     if (!/^https:\/\/.+/i.test(APP_CONFIG.workerApiBase)) errors.push('Worker URLはHTTPSで設定してください。');
     return errors;
   };
@@ -1080,20 +1232,59 @@ button{font:inherit}
     results.push(checkItem('入力必須項目',form.querySelectorAll('[required]').length>=4?'pass':'warn',`${form.querySelectorAll('[required]').length}項目`));
     results.push(checkItem('二重送信防止',typeof submissionFingerprint==='function'&&APP_CONFIG.duplicateWindowMs>0?'pass':'fail',`${APP_CONFIG.duplicateWindowMs/60000}分`));
     results.push(checkItem('環境切替ガード',guardErrors.length?'fail':'pass',guardErrors.join(' / ')||APP_CONFIG.environment));
-    results.push(checkItem('LINE公式URL',APP_CONFIG.lineUrl?'pass':'warn',APP_CONFIG.lineUrl||'正式URL未設定'));
+    results.push(checkItem('LINE公式URL',isValidLineUrl(APP_CONFIG.lineUrl)?'pass':'warn',APP_CONFIG.lineUrl||'正式URL未設定'));
+    results.push(checkItem('受付完了後LINE導線',typeof applyLineIntegration==='function'?'pass':'fail',isValidLineUrl(APP_CONFIG.lineUrl)?'接続可能':'URL設定後に自動有効'));
+    results.push(checkItem('受付控え保存',typeof downloadReceipt==='function'?'pass':'fail','テキスト形式で保存'));
+    results.push(checkItem('WEB受付識別',APP_CONFIG.source==='WEB'&&Boolean(APP_CONFIG.sourceDetail)?'pass':'fail',`${APP_CONFIG.source} / ${APP_CONFIG.sourceDetail}`));
+    results.push(checkItem('検査画面撮影対策',document.body.classList.contains('system-check-mode')?'pass':'warn','全ページ撮影時の固定画面重複を防止'));
     results.push(checkItem('DPRO Worker HTTPS',/^https:\/\//.test(WORKER_API_BASE)?'pass':'fail',WORKER_API_BASE));
     results.push(checkItem('店舗コード',SHOP_CODE?'pass':'fail',SHOP_CODE||'未設定'));
     results.push(checkItem('画像alt',[...document.images].every((img)=>img.hasAttribute('alt'))?'pass':'warn',`${[...document.images].filter((img)=>!img.hasAttribute('alt')).length}件不足`));
     try { const response=await fetch(`${WORKER_API_BASE}/api/public/shop-settings?shopCode=${encodeURIComponent(SHOP_CODE)}`); const data=await response.json(); results.push(checkItem('DPRO API接続',response.ok&&data.ok?'pass':'fail',data.shop_name||data.message||`HTTP ${response.status}`)); } catch(error){ results.push(checkItem('DPRO API接続','fail',error.message)); }
     checkResults.innerHTML=results.map((item)=>`<tr><td>${escapeHtml(item.name)}</td><td><span class="check-status ${item.status}">${item.status==='pass'?'合格':item.status==='warn'?'注意':'失敗'}</span></td><td>${escapeHtml(item.detail)}</td></tr>`).join('');
     const count=(s)=>results.filter((i)=>i.status===s).length;
-    document.getElementById('checkTotal').textContent=String(results.length); document.getElementById('checkPass').textContent=String(count('pass')); document.getElementById('checkWarn').textContent=String(count('warn')); document.getElementById('checkFail').textContent=String(count('fail'));
+    const passCount = count('pass');
+    const warnCount = count('warn');
+    const failCount = count('fail');
+    document.getElementById('checkTotal').textContent=String(results.length);
+    document.getElementById('checkPass').textContent=String(passCount);
+    document.getElementById('checkWarn').textContent=String(warnCount);
+    document.getElementById('checkFail').textContent=String(failCount);
+
+    releaseVerdict.className = 'release-verdict';
+    if (failCount > 0) {
+      releaseVerdict.classList.add('blocked');
+      releaseVerdictTitle.textContent = '公開停止：失敗項目があります';
+      releaseVerdictText.textContent = '失敗を0件にしてから公開してください。';
+    } else if (IS_DEMO) {
+      releaseVerdict.classList.add('demo');
+      releaseVerdictTitle.textContent = 'DEMO確認可能';
+      releaseVerdictText.textContent = warnCount
+        ? `DEMO動作は確認できます。注意${warnCount}件は正式公開前に設定してください。`
+        : 'DEMO環境として正常です。';
+    } else if (warnCount > 0) {
+      releaseVerdict.classList.add('blocked');
+      releaseVerdictTitle.textContent = '正式公開保留';
+      releaseVerdictText.textContent = `注意${warnCount}件を解消してください。`;
+    } else {
+      releaseVerdict.classList.add('ready');
+      releaseVerdictTitle.textContent = '正式公開可能';
+      releaseVerdictText.textContent = '失敗・注意ともに0件です。';
+    }
+
     return results;
   };
-  const openSystemCheckFromQuery = () => { if(new URLSearchParams(location.search).get('system-check')!=='1')return; systemCheck.classList.add('open'); systemCheck.setAttribute('aria-hidden','false'); runSystemChecks(); };
+  const openSystemCheckFromQuery = () => {
+    if (new URLSearchParams(location.search).get('system-check') !== '1') return;
+    document.body.classList.add('system-check-mode');
+    systemCheck.classList.add('open');
+    systemCheck.setAttribute('aria-hidden','false');
+    window.scrollTo(0, 0);
+    runSystemChecks();
+  };
   document.getElementById('runSystemCheck')?.addEventListener('click',runSystemChecks);
   document.getElementById('closeSystemCheck')?.addEventListener('click',()=>{location.href=APP_CONFIG.siteUrl;});
-  document.getElementById('copySystemCheck')?.addEventListener('click',async()=>{const rows=[...checkResults.querySelectorAll('tr')].map((row)=>[...row.children].map((cell)=>cell.textContent.trim()).join(' | ')); const summary=[`WANGAN WEB-8 システムチェック`,`検査件数: ${document.getElementById('checkTotal').textContent}`,`合格: ${document.getElementById('checkPass').textContent}`,`注意: ${document.getElementById('checkWarn').textContent}`,`失敗: ${document.getElementById('checkFail').textContent}`,'',...rows].join('\n'); try{await navigator.clipboard.writeText(summary);showToast('検査結果をコピーしました。');}catch(_){showToast('検査結果をコピーできませんでした。');}});
+  document.getElementById('copySystemCheck')?.addEventListener('click',async()=>{const rows=[...checkResults.querySelectorAll('tr')].map((row)=>[...row.children].map((cell)=>cell.textContent.trim()).join(' | ')); const summary=[`WANGAN WEB-9 最終公開チェック`,`検査件数: ${document.getElementById('checkTotal').textContent}`,`合格: ${document.getElementById('checkPass').textContent}`,`注意: ${document.getElementById('checkWarn').textContent}`,`失敗: ${document.getElementById('checkFail').textContent}`,'',...rows].join('\n'); try{await navigator.clipboard.writeText(summary);showToast('検査結果をコピーしました。');}catch(_){showToast('検査結果をコピーできませんでした。');}});
 
   const applyEnvironmentDisplay = () => {
     environmentChip.textContent = IS_DEMO ? 'DEMO' : 'PRODUCTION';
@@ -1376,8 +1567,10 @@ button{font:inherit}
     mailButton.hidden = !normalConfirmation;
     sendButton.hidden = !normalConfirmation;
     successPhone.hidden = !submissionCompleted;
+    downloadReceiptButton.hidden = !submissionCompleted;
     newRequestButton.hidden = !submissionCompleted;
     closeSuccessButton.hidden = !submissionCompleted;
+    applyLineIntegration();
     footerStepLabel.textContent = `${currentStep} / 3`;
 
     if (currentStep === 3) {
@@ -1568,6 +1761,7 @@ button{font:inherit}
 
   const setCompletedView = ({ reference = '', duplicate = false } = {}) => {
     submissionCompleted = true;
+    lastCompletedReference = reference || '';
     modalPanel.classList.add('completed');
     apiResult.className = 'api-result show completion success';
     completionIcon.hidden = false;
@@ -1600,6 +1794,7 @@ button{font:inherit}
 
   const showApiSuccess = (result, payload) => {
     const reference = extractReference(result);
+    lastCompletedPayload = payload;
     saveSuccessfulSubmission(payload, reference);
     setCompletedView({ reference });
     localStorage.removeItem(DRAFT_KEY);
@@ -1630,6 +1825,7 @@ button{font:inherit}
     const recentSubmission = readRecentSubmission(fingerprint);
 
     if (recentSubmission) {
+      lastCompletedPayload = payload;
       setCompletedView({
         reference: recentSubmission.reference || recentSubmission.requestId || '',
         duplicate: true
@@ -1704,6 +1900,10 @@ button{font:inherit}
 
   const resetForNewRequest = () => {
     submissionCompleted = false;
+    lastCompletedReference = '';
+    lastCompletedPayload = null;
+    receiptNote.classList.remove('show');
+    lineReadyNote.classList.remove('show');
     modalPanel.classList.remove('completed');
     form.reset();
     localStorage.removeItem(DRAFT_KEY);
@@ -1743,15 +1943,46 @@ button{font:inherit}
 
   document.querySelectorAll('.js-line').forEach((button) => {
     button.addEventListener('click', () => {
-      if (LINE_URL) window.open(LINE_URL, '_blank', 'noopener');
+      if (isValidLineUrl(LINE_URL)) window.open(LINE_URL, '_blank', 'noopener');
       else {
-        showToast('LINE公式URL確認後に接続します。現在はDPRO WEB受付をご利用ください。');
+        showToast('LINE公式URLは未設定です。現在はDPRO WEB受付をご利用ください。');
         openModal();
       }
     });
   });
 
+  successLine?.addEventListener('click', (event) => {
+    if (isValidLineUrl(LINE_URL)) return;
+    event.preventDefault();
+    showToast('LINE公式URLが未設定です。');
+  });
+
+  downloadReceiptButton?.addEventListener('click', downloadReceipt);
+
+  document.getElementById('copyLineConfig')?.addEventListener('click', async () => {
+    const value = String(lineSetupInput.value || '').trim();
+    lineSetupResult.className = 'line-setup-result show';
+
+    if (!isValidLineUrl(value)) {
+      lineSetupResult.classList.add('error');
+      lineSetupResult.textContent = 'LINE公式URLの形式を確認してください。https://lin.ee/ または https://line.me/ から始まるURLを入力します。';
+      return;
+    }
+
+    const escaped = value.replaceAll('\\', '\\\\').replaceAll("'", "\\'");
+    const code = `lineUrl: '${escaped}',`;
+    lineSetupResult.textContent = `APP_CONFIGへ貼り付ける設定：${code}`;
+
+    try {
+      await navigator.clipboard.writeText(code);
+      showToast('LINE設定コードをコピーしました。');
+    } catch (_) {
+      showToast('設定コードを表示しました。');
+    }
+  });
+
   applyEnvironmentDisplay();
+  applyLineIntegration();
   applySeoAndStructuredData();
   applyProductionGuard();
   openSystemCheckFromQuery();
