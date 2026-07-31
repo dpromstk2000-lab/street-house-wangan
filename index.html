@@ -532,6 +532,68 @@ body.system-check-mode #systemCheck{
   .modal-panel.completed .modal-footer .btn-phone{grid-column:1/-1}
 }
 
+
+/* STEP WANGAN-WEB-10: final delivery / production config generator */
+.final-delivery-card{
+  margin:0 0 18px;padding:19px;background:
+    linear-gradient(135deg,rgba(242,197,21,.11),transparent 62%),#121b22;
+  border:1px solid rgba(255,255,255,.1);border-left:5px solid var(--yellow)
+}
+.final-delivery-card .final-kicker{
+  display:block;color:var(--yellow);font-size:9px;font-weight:1000;letter-spacing:.22em
+}
+.final-delivery-card h2{margin:6px 0 5px;font-size:21px}
+.final-delivery-card p{margin:0;color:#abb5bd;font-size:10px}
+.final-delivery-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.final-delivery-meta span{
+  padding:6px 9px;background:#091016;border:1px solid rgba(255,255,255,.1);
+  color:#d7dde1;font-size:9px;font-weight:900
+}
+
+.production-generator{
+  margin:0 0 18px;padding:18px;background:#121b22;border:1px solid rgba(255,255,255,.1)
+}
+.production-generator h2{margin:0 0 6px;font-size:18px}
+.production-generator>p{margin:0 0 14px;color:#aeb8c0;font-size:10px;line-height:1.7}
+.production-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.production-field{display:grid;gap:6px}
+.production-field.full{grid-column:1/-1}
+.production-field label{font-size:9px;color:#aeb8c0;font-weight:900}
+.production-field input{
+  width:100%;min-width:0;padding:11px 12px;border:1px solid rgba(255,255,255,.17);
+  background:#091016;color:#fff;font:inherit;font-size:11px
+}
+.production-generator-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
+.production-generator-actions button{
+  border:0;padding:11px 15px;font-weight:1000;cursor:pointer
+}
+.production-copy{background:var(--yellow);color:#111}
+.production-download{background:#fff;color:#111}
+.production-result{
+  display:none;margin-top:12px;padding:13px;background:#091016;border-left:4px solid var(--yellow);
+  color:#d5dce1;font:10px/1.7 Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere
+}
+.production-result.show{display:block}
+.production-result.error{border-left-color:#d64141;color:#ffd5d5}
+.generator-note{
+  margin-top:12px;padding:11px 13px;background:#0d151b;border-left:4px solid #65727d;
+  color:#9facb5;font-size:9px;line-height:1.65
+}
+
+.final-check-list{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:14px
+}
+.final-check-list div{padding:11px;background:#091016;border:1px solid rgba(255,255,255,.09)}
+.final-check-list b{display:block;color:#ffe06a;font-size:9px;margin-bottom:4px}
+.final-check-list span{font-size:9px;color:#aeb8c0}
+
+@media(max-width:760px){
+  .production-grid{grid-template-columns:1fr}
+  .production-field.full{grid-column:auto}
+  .production-generator-actions{display:grid}
+  .final-check-list{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -708,7 +770,7 @@ body.system-check-mode #systemCheck{
       <div class="actions"><a class="btn btn-primary" href="tel:08052410066">電話で相談　080-5241-0066</a><button class="btn btn-ghost js-open-estimate" type="button">DPRO WEB受付を開く</button><button class="btn btn-line js-line" type="button">LINEで相談</button></div><div class="dpro-site-note" id="environmentNote">
   <b id="environmentLabel">DPRO DEMO連動</b>
   <span id="environmentText">WEB受付内容を店舗管理画面へまとめて登録します。</span>
-  <span class="version-badge">WEB-9</span>
+  <span class="version-badge">WEB-10 FINAL</span>
 </div>
     </div>
   </section>
@@ -1003,12 +1065,78 @@ body.system-check-mode #systemCheck{
 </div>
 <section class="system-check" id="systemCheck" aria-hidden="true">
   <div class="check-shell">
-    <header class="check-head"><div><p>INTERNAL SYSTEM CHECK</p><h1>WANGAN WEB-9 最終公開チェック</h1><small>通常のお客様画面には表示されません。URLへ <code>?system-check=1</code> を付けた場合のみ開きます。</small></div><button class="check-close" id="closeSystemCheck" type="button">サイトへ戻る</button></header>
+    <header class="check-head"><div><p>INTERNAL SYSTEM CHECK</p><h1>WANGAN WEB-10 最終納品・公開切替チェック</h1><small>通常のお客様画面には表示されません。URLへ <code>?system-check=1</code> を付けた場合のみ開きます。</small></div><button class="check-close" id="closeSystemCheck" type="button">サイトへ戻る</button></header>
     <div class="check-summary"><div><b id="checkTotal">0</b><span>検査件数</span></div><div><b id="checkPass">0</b><span>合格</span></div><div><b id="checkWarn">0</b><span>注意</span></div><div><b id="checkFail">0</b><span>失敗</span></div></div>
+
+    <section class="final-delivery-card">
+      <span class="final-kicker">FINAL DELIVERY VERSION</span>
+      <h2>WANGAN WEB-10 最終納品版</h2>
+      <p>デザイン、DPRO WEB受付、30分枠取得、二重送信防止、プライバシー、SEO、内部検査まで統合済みです。</p>
+      <div class="final-delivery-meta">
+        <span>GitHub Pages対応</span>
+        <span>index.html 1ファイル完結</span>
+        <span>DPRO DEMO接続済み</span>
+        <span>正式公開切替対応</span>
+      </div>
+      <div class="final-check-list">
+        <div><b>現在</b><span>DEMO完成版として提示可能</span></div>
+        <div><b>正式公開前</b><span>Worker・店舗コード・LINE URLを正式値へ変更</span></div>
+        <div><b>公開条件</b><span>システムチェックの注意・失敗を0件</span></div>
+      </div>
+    </section>
+
     <div class="release-verdict demo" id="releaseVerdict">
       <b id="releaseVerdictTitle">検査待ち</b>
       <span id="releaseVerdictText">一括検査を実行すると、DEMO確認または正式公開の判定を表示します。</span>
     </div>
+
+
+    <section class="production-generator">
+      <h2>正式公開用 APP_CONFIG 生成</h2>
+      <p>
+        正式なDPRO Worker、店舗コード、受付メール、LINE公式URLを入力すると、
+        index.htmlへ貼り付ける正式公開設定ブロックを生成します。入力内容は自動反映・外部送信されません。
+      </p>
+
+      <div class="production-grid">
+        <div class="production-field full">
+          <label for="productionWorkerUrl">正式DPRO Worker URL</label>
+          <input id="productionWorkerUrl" type="url" placeholder="https://xxxxxxxx.workers.dev">
+        </div>
+
+        <div class="production-field">
+          <label for="productionShopCode">正式店舗コード</label>
+          <input id="productionShopCode" type="text" placeholder="street_house_kitsuki">
+        </div>
+
+        <div class="production-field">
+          <label for="productionEmail">受付メールアドレス</label>
+          <input id="productionEmail" type="email" placeholder="shop@example.com">
+        </div>
+
+        <div class="production-field">
+          <label for="productionLineUrl">LINE公式 友だち追加URL</label>
+          <input id="productionLineUrl" type="url" placeholder="https://lin.ee/xxxxxxxx">
+        </div>
+
+        <div class="production-field">
+          <label for="productionSiteUrl">正式サイトURL</label>
+          <input id="productionSiteUrl" type="url" value="https://dpromstk2000-lab.github.io/street-house-wangan/">
+        </div>
+      </div>
+
+      <div class="production-generator-actions">
+        <button class="production-copy" id="copyProductionConfig" type="button">正式公開設定を生成・コピー</button>
+        <button class="production-download" id="downloadProductionConfig" type="button">設定ファイルを保存</button>
+      </div>
+
+      <div class="production-result" id="productionConfigResult"></div>
+
+      <div class="generator-note">
+        生成後、index.html内の <code>const APP_CONFIG = Object.freeze({ ... });</code>
+        全体を置き換えます。正式値が未確定の項目を推測して公開しないでください。
+      </div>
+    </section>
 
     <div class="line-setup">
       <h2>LINE公式URL 設定支援</h2>
@@ -1022,7 +1150,7 @@ body.system-check-mode #systemCheck{
 
     <div class="check-actions"><button class="check-run" id="runSystemCheck" type="button">一括検査を実行</button><button class="check-copy" id="copySystemCheck" type="button">検査結果をコピー</button><a class="check-site" href="./">通常サイトを開く</a></div>
     <table class="check-table"><thead><tr><th>項目</th><th>結果</th><th>詳細</th></tr></thead><tbody id="checkResults"></tbody></table>
-    <div class="check-note">正式公開前は、APP_CONFIGのenvironment、Worker URL、店舗コード、メール、LINE URLを正式値へ変更し、検査の「失敗」を0件にしてください。</div>
+    <div class="check-note">正式公開前は、正式公開用APP_CONFIGを反映し、検査の「注意」「失敗」をともに0件にしてください。DEMO完成版のまま親戚・店舗へ提示することは可能です。</div>
   </div>
 </section>
 
@@ -1108,6 +1236,12 @@ body.system-check-mode #systemCheck{
   const releaseVerdictText = document.getElementById('releaseVerdictText');
   const lineSetupInput = document.getElementById('lineSetupInput');
   const lineSetupResult = document.getElementById('lineSetupResult');
+  const productionWorkerUrl = document.getElementById('productionWorkerUrl');
+  const productionShopCode = document.getElementById('productionShopCode');
+  const productionEmail = document.getElementById('productionEmail');
+  const productionLineUrl = document.getElementById('productionLineUrl');
+  const productionSiteUrl = document.getElementById('productionSiteUrl');
+  const productionConfigResult = document.getElementById('productionConfigResult');
 
   let currentStep = 1;
   let lastFocusedElement = null;
@@ -1138,6 +1272,93 @@ body.system-check-mode #systemCheck{
     });
   });
 
+
+  const isValidEmail = (value) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
+
+  const isHttpsUrl = (value) => {
+    try {
+      const url = new URL(String(value || '').trim());
+      return url.protocol === 'https:';
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const escapeConfigValue = (value) =>
+    String(value || '').replaceAll('\\', '\\\\').replaceAll("'", "\\'");
+
+  const getProductionConfigInput = () => ({
+    workerApiBase: String(productionWorkerUrl.value || '').trim(),
+    shopCode: String(productionShopCode.value || '').trim(),
+    contactEmail: String(productionEmail.value || '').trim(),
+    lineUrl: String(productionLineUrl.value || '').trim(),
+    siteUrl: String(productionSiteUrl.value || '').trim()
+  });
+
+  const validateProductionConfig = (values) => {
+    const errors = [];
+
+    if (!isHttpsUrl(values.workerApiBase)) errors.push('正式DPRO Worker URLはHTTPSで入力してください。');
+    if (/demo/i.test(values.workerApiBase)) errors.push('正式Worker URLに demo が含まれています。');
+    if (!values.shopCode) errors.push('正式店舗コードを入力してください。');
+    if (/demo/i.test(values.shopCode)) errors.push('正式店舗コードに demo が含まれています。');
+    if (!isValidEmail(values.contactEmail)) errors.push('受付メールアドレスを確認してください。');
+    if (!isValidLineUrl(values.lineUrl)) errors.push('LINE公式URLを確認してください。');
+    if (!isHttpsUrl(values.siteUrl)) errors.push('正式サイトURLはHTTPSで入力してください。');
+
+    return errors;
+  };
+
+  const buildProductionConfig = (values) => `const APP_CONFIG = Object.freeze({
+    environment: 'production',
+    workerApiBase: '${escapeConfigValue(values.workerApiBase)}',
+    shopCode: '${escapeConfigValue(values.shopCode)}',
+    contactEmail: '${escapeConfigValue(values.contactEmail)}',
+    lineUrl: '${escapeConfigValue(values.lineUrl)}',
+    source: 'WEB',
+    sourceDetail: 'street-house-wangan',
+    duplicateWindowMs: 10 * 60 * 1000,
+    siteUrl: '${escapeConfigValue(values.siteUrl)}',
+    siteName: 'ストリートハウス湾岸通り',
+    businessName: 'ストリートハウス湾岸通り',
+    postalAddress: '大分県杵築市大字守江1291-3',
+    telephone: '080-5241-0066'
+  });`;
+
+  const showProductionConfigResult = (text, isError = false) => {
+    productionConfigResult.textContent = text;
+    productionConfigResult.className = `production-result show${isError ? ' error' : ''}`;
+  };
+
+  const generateProductionConfig = () => {
+    const values = getProductionConfigInput();
+    const errors = validateProductionConfig(values);
+
+    if (errors.length) {
+      showProductionConfigResult(errors.join('\n'), true);
+      return null;
+    }
+
+    const config = buildProductionConfig(values);
+    showProductionConfigResult(config);
+    return config;
+  };
+
+  const copyText = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (_) {
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      const copied = document.execCommand('copy');
+      temp.remove();
+      return copied;
+    }
+  };
 
   const isValidLineUrl = (url) =>
     /^https:\/\/(?:lin\.ee\/|line\.me\/|liff\.line\.me\/)/i.test(String(url || '').trim());
@@ -1237,6 +1458,8 @@ body.system-check-mode #systemCheck{
     results.push(checkItem('受付控え保存',typeof downloadReceipt==='function'?'pass':'fail','テキスト形式で保存'));
     results.push(checkItem('WEB受付識別',APP_CONFIG.source==='WEB'&&Boolean(APP_CONFIG.sourceDetail)?'pass':'fail',`${APP_CONFIG.source} / ${APP_CONFIG.sourceDetail}`));
     results.push(checkItem('検査画面撮影対策',document.body.classList.contains('system-check-mode')?'pass':'warn','全ページ撮影時の固定画面重複を防止'));
+    results.push(checkItem('最終納品バージョン',document.querySelector('.version-badge')?.textContent.includes('WEB-10')?'pass':'fail',document.querySelector('.version-badge')?.textContent||'未確認'));
+    results.push(checkItem('正式公開設定生成',typeof buildProductionConfig==='function'&&typeof validateProductionConfig==='function'?'pass':'fail','APP_CONFIG一括生成'));
     results.push(checkItem('DPRO Worker HTTPS',/^https:\/\//.test(WORKER_API_BASE)?'pass':'fail',WORKER_API_BASE));
     results.push(checkItem('店舗コード',SHOP_CODE?'pass':'fail',SHOP_CODE||'未設定'));
     results.push(checkItem('画像alt',[...document.images].every((img)=>img.hasAttribute('alt'))?'pass':'warn',`${[...document.images].filter((img)=>!img.hasAttribute('alt')).length}件不足`));
@@ -1284,7 +1507,7 @@ body.system-check-mode #systemCheck{
   };
   document.getElementById('runSystemCheck')?.addEventListener('click',runSystemChecks);
   document.getElementById('closeSystemCheck')?.addEventListener('click',()=>{location.href=APP_CONFIG.siteUrl;});
-  document.getElementById('copySystemCheck')?.addEventListener('click',async()=>{const rows=[...checkResults.querySelectorAll('tr')].map((row)=>[...row.children].map((cell)=>cell.textContent.trim()).join(' | ')); const summary=[`WANGAN WEB-9 最終公開チェック`,`検査件数: ${document.getElementById('checkTotal').textContent}`,`合格: ${document.getElementById('checkPass').textContent}`,`注意: ${document.getElementById('checkWarn').textContent}`,`失敗: ${document.getElementById('checkFail').textContent}`,'',...rows].join('\n'); try{await navigator.clipboard.writeText(summary);showToast('検査結果をコピーしました。');}catch(_){showToast('検査結果をコピーできませんでした。');}});
+  document.getElementById('copySystemCheck')?.addEventListener('click',async()=>{const rows=[...checkResults.querySelectorAll('tr')].map((row)=>[...row.children].map((cell)=>cell.textContent.trim()).join(' | ')); const summary=[`WANGAN WEB-10 最終納品・公開切替チェック`,`検査件数: ${document.getElementById('checkTotal').textContent}`,`合格: ${document.getElementById('checkPass').textContent}`,`注意: ${document.getElementById('checkWarn').textContent}`,`失敗: ${document.getElementById('checkFail').textContent}`,'',...rows].join('\n'); try{await navigator.clipboard.writeText(summary);showToast('検査結果をコピーしました。');}catch(_){showToast('検査結果をコピーできませんでした。');}});
 
   const applyEnvironmentDisplay = () => {
     environmentChip.textContent = IS_DEMO ? 'DEMO' : 'PRODUCTION';
@@ -1979,6 +2202,47 @@ body.system-check-mode #systemCheck{
     } catch (_) {
       showToast('設定コードを表示しました。');
     }
+  });
+
+  document.getElementById('copyProductionConfig')?.addEventListener('click', async () => {
+    const config = generateProductionConfig();
+    if (!config) {
+      showToast('正式公開設定の入力内容を確認してください。');
+      return;
+    }
+
+    const copied = await copyText(config);
+    showToast(copied ? '正式公開用APP_CONFIGをコピーしました。' : '設定コードを表示しました。');
+  });
+
+  document.getElementById('downloadProductionConfig')?.addEventListener('click', () => {
+    const config = generateProductionConfig();
+    if (!config) {
+      showToast('正式公開設定の入力内容を確認してください。');
+      return;
+    }
+
+    const fileText = [
+      'WANGAN WEB-10 正式公開用APP_CONFIG',
+      '====================================',
+      '',
+      config,
+      '',
+      '貼り付け場所：index.html内の const APP_CONFIG = Object.freeze({ ... }); 全体',
+      '反映後確認：https://dpromstk2000-lab.github.io/street-house-wangan/?system-check=1',
+      '公開条件：注意0件・失敗0件'
+    ].join('\n');
+
+    const blob = new Blob([fileText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'WANGAN-WEB-10_PRODUCTION-CONFIG.txt';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    showToast('正式公開設定ファイルを保存しました。');
   });
 
   applyEnvironmentDisplay();
