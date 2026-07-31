@@ -208,7 +208,8 @@ button{font:inherit}
   .mobile-cta a:last-child{border:0;background:var(--yellow);color:#0a0c0e}
 }
 
-/* STEP WANGAN-WEB-4: FAQ / estimate form */
+
+/* STEP WANGAN-WEB-5: 3-step estimate form */
 .faq-section{background:#f1f3f4;color:#171b20}
 .faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .faq-grid details{background:#fff;border:1px solid #e1e5e8;box-shadow:0 10px 25px rgba(20,25,30,.06)}
@@ -218,59 +219,115 @@ button{font:inherit}
 .faq-grid details[open] summary::after{content:"−"}
 .faq-grid details p{margin:0;padding:0 22px 21px;color:#626c75;font-size:13px}
 
-.estimate-modal{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:22px}
+.estimate-modal{
+  position:absolute;left:0;right:0;z-index:300;height:100vh;
+  display:none;align-items:center;justify-content:center;padding:20px
+}
 .estimate-modal.open{display:flex}
-.modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(7px)}
-.modal-panel{position:relative;z-index:2;width:min(850px,100%);max-height:92vh;overflow:auto;background:#f5f6f7;color:#171b20;box-shadow:0 28px 80px rgba(0,0,0,.48)}
-.modal-head{position:sticky;top:0;z-index:3;background:#101419;color:#fff;padding:24px 72px 22px 28px;border-bottom:4px solid var(--yellow)}
+.modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.80);backdrop-filter:blur(7px)}
+.modal-panel{
+  position:relative;z-index:2;width:min(900px,100%);height:min(760px,calc(100vh - 40px));
+  display:flex;flex-direction:column;overflow:hidden;background:#f4f6f7;color:#171b20;
+  box-shadow:0 28px 90px rgba(0,0,0,.55)
+}
+.modal-head{flex:0 0 auto;background:#101419;color:#fff;padding:20px 72px 17px 26px;border-bottom:4px solid var(--yellow)}
 .modal-head .mini{margin:0;color:var(--yellow);font-size:10px;font-weight:1000;letter-spacing:.24em}
-.modal-head h2{margin:6px 0 5px;font-size:30px;line-height:1.25}
-.modal-head p{margin:0;color:#b8c0c7;font-size:12px}
-.modal-close{position:absolute;right:20px;top:18px;width:42px;height:42px;border:1px solid rgba(255,255,255,.22);background:transparent;color:#fff;font-size:25px;cursor:pointer}
-.estimate-form{padding:28px}
-.form-step{display:flex;gap:8px;align-items:center;margin:0 0 20px;font-size:11px;font-weight:900;color:#626b73}
-.form-step span{display:grid;place-items:center;width:25px;height:25px;border-radius:50%;background:var(--yellow);color:#111}
+.modal-head h2{margin:5px 0 4px;font-size:28px;line-height:1.25}
+.modal-head p{margin:0;color:#b8c0c7;font-size:11px}
+.modal-close{position:absolute;right:18px;top:17px;width:42px;height:42px;border:1px solid rgba(255,255,255,.22);background:transparent;color:#fff;font-size:25px;cursor:pointer}
+
+.stepper{flex:0 0 auto;display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border-bottom:1px solid #dfe4e7}
+.stepper-item{position:relative;display:flex;align-items:center;justify-content:center;gap:9px;padding:15px 10px;color:#8a9299;font-size:11px;font-weight:900}
+.stepper-item::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:transparent}
+.stepper-item .step-number{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#dde2e5;color:#667079}
+.stepper-item.active{color:#171b20}
+.stepper-item.active::after{background:var(--yellow)}
+.stepper-item.active .step-number{background:var(--yellow);color:#111}
+.stepper-item.done .step-number{background:#171b20;color:#fff}
+.stepper-item.done::after{background:#171b20}
+
+.estimate-form{display:flex;flex:1 1 auto;min-height:0;flex-direction:column}
+.modal-scroll{flex:1 1 auto;min-height:0;overflow:auto;padding:25px 28px 30px}
+.step-panel{display:none}
+.step-panel.active{display:block}
+.panel-title{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:20px}
+.panel-title div{display:grid;gap:3px}
+.panel-title h3{margin:0;font-size:23px;line-height:1.3}
+.panel-title p{margin:0;color:#68727a;font-size:11px}
+.draft-status{font-size:10px;color:#737c84;text-align:right;white-space:nowrap}
+
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px}
 .field{display:grid;gap:7px}
 .field.full{grid-column:1/-1}
 .field label{font-size:12px;font-weight:900}
-.req{color:#ca2a2a}
+.req{color:#c92828}
 .field input,.field select,.field textarea{
-  width:100%;border:1px solid #cfd5d9;background:#fff;color:#14181c;padding:12px 13px;border-radius:0;
-  font:inherit;font-size:14px;outline:none
+  width:100%;border:1px solid #cbd2d6;background:#fff;color:#14181c;
+  padding:12px 13px;border-radius:0;font:inherit;font-size:14px;outline:none
 }
 .field input:focus,.field select:focus,.field textarea:focus{border-color:#8b6d00;box-shadow:0 0 0 3px rgba(242,197,21,.18)}
-.field textarea{min-height:135px;resize:vertical}
+.field [aria-invalid="true"]{border-color:#c92828;background:#fff8f8}
+.field textarea{min-height:145px;resize:vertical}
 .field small{font-size:10px;color:#707981}
-.form-check{display:flex;align-items:flex-start;gap:9px;margin:20px 0 0;font-size:11px;color:#555f67}
+.form-check{display:flex;align-items:flex-start;gap:9px;margin:20px 0 0;padding:14px;background:#fff;border:1px solid #dbe0e3;font-size:11px;color:#555f67}
 .form-check input{margin-top:5px}
-.form-actions{display:flex;gap:11px;flex-wrap:wrap;margin-top:22px}
-.form-actions .btn{min-width:180px}
-.btn-copy{background:#fff;border-color:#bfc6cb;color:#222}
-.form-help{margin:16px 0 0;padding:13px 15px;background:#fff8d8;border-left:4px solid var(--yellow);font-size:11px;color:#5d542d}
-.form-error{display:none;margin:15px 0 0;padding:12px 14px;background:#ffe5e5;color:#851c1c;font-size:12px;font-weight:800}
+.form-error{display:none;margin:17px 0 0;padding:12px 14px;background:#ffe5e5;color:#851c1c;font-size:12px;font-weight:800}
 .form-error.show{display:block}
-.draft-status{margin-left:auto;font-size:10px;color:#737c84}
-.modal-result{display:none;padding:25px 28px 31px;background:#fff;border-top:1px solid #dfe3e6}
-.modal-result.show{display:block}
-.modal-result h3{margin:0 0 8px;font-size:22px}
-.modal-result p{margin:0;color:#606a72;font-size:12px}
-.result-preview{margin-top:15px;max-height:230px;overflow:auto;white-space:pre-wrap;background:#11161c;color:#e9ecef;padding:15px;font-size:11px;line-height:1.65}
+.line-guide{margin-top:16px;padding:15px;background:#eafff1;border-left:4px solid var(--green);font-size:11px;color:#265838}
 
-.line-guide{margin-top:16px;padding:16px;background:#eafff1;border-left:4px solid var(--green);font-size:12px;color:#265838}
+.confirm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.confirm-card{background:#fff;border:1px solid #dce1e4;padding:17px 18px}
+.confirm-card.full{grid-column:1/-1}
+.confirm-card h4{margin:0 0 11px;font-size:13px;color:#8a6d00}
+.confirm-list{margin:0;display:grid;gap:9px}
+.confirm-list div{display:grid;grid-template-columns:135px 1fr;gap:12px;padding-bottom:8px;border-bottom:1px solid #eceff1}
+.confirm-list div:last-child{border-bottom:0;padding-bottom:0}
+.confirm-list dt{font-size:10px;font-weight:900;color:#778088}
+.confirm-list dd{margin:0;font-size:12px;font-weight:800;overflow-wrap:anywhere}
+.confirm-message{white-space:pre-wrap;line-height:1.7;font-weight:500!important}
+.confirm-notice{margin:15px 0 0;padding:13px 15px;background:#fff7d1;border-left:4px solid var(--yellow);color:#5d542d;font-size:11px}
+
+.modal-footer{
+  flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:14px 18px;
+  background:#fff;border-top:1px solid #d8dde0;box-shadow:0 -9px 24px rgba(17,22,28,.08)
+}
+.modal-footer .spacer{flex:1}
+.modal-footer .btn{min-height:49px;padding:11px 19px;min-width:135px}
+.btn-secondary{background:#fff;border-color:#bcc4c9;color:#252a2e}
+.btn-mail{background:var(--yellow);color:#111}
+.btn-copy{background:#11161c;color:#fff;border-color:#11161c}
+.clear-draft{border:0;background:transparent;color:#737c84;text-decoration:underline;text-underline-offset:3px;font-size:10px;cursor:pointer}
+.footer-step-label{font-size:10px;color:#778088;font-weight:900}
+
+.modal-result{display:none;margin-top:16px;padding:17px 18px;background:#fff;border:1px solid #dce1e4}
+.modal-result.show{display:block}
+.modal-result h4{margin:0 0 6px;font-size:17px}
+.modal-result p{margin:0;color:#606a72;font-size:11px}
+.result-preview{margin-top:12px;max-height:220px;overflow:auto;white-space:pre-wrap;background:#11161c;color:#e9ecef;padding:14px;font-size:10px;line-height:1.65}
+
 .mobile-cta button{border:0;background:var(--yellow);color:#0a0c0e;font:inherit;font-size:11px;font-weight:900;cursor:pointer}
 
 @media(max-width:760px){
   .faq-grid{grid-template-columns:1fr}
-  .modal-panel{max-height:96vh}
-  .modal-head{padding:20px 65px 18px 20px}
-  .modal-head h2{font-size:25px}
-  .estimate-form{padding:21px 17px}
-  .form-grid{grid-template-columns:1fr}
-  .field.full{grid-column:auto}
-  .form-actions{display:grid}
-  .form-actions .btn{width:100%}
-  .draft-status{margin:0;text-align:center}
+  .estimate-modal{padding:0}
+  .modal-panel{width:100%;height:100vh}
+  .modal-head{padding:17px 61px 14px 17px}
+  .modal-head h2{font-size:23px}
+  .modal-head p{font-size:10px}
+  .modal-close{right:12px;top:12px}
+  .stepper-item{display:grid;justify-items:center;gap:4px;padding:10px 3px;font-size:9px;text-align:center}
+  .stepper-item .step-number{width:23px;height:23px}
+  .modal-scroll{padding:19px 15px 24px}
+  .panel-title{display:grid;gap:7px}
+  .panel-title h3{font-size:20px}
+  .draft-status{text-align:left;white-space:normal}
+  .form-grid,.confirm-grid{grid-template-columns:1fr}
+  .field.full,.confirm-card.full{grid-column:auto}
+  .confirm-list div{grid-template-columns:105px 1fr}
+  .modal-footer{padding:10px;gap:7px}
+  .modal-footer .btn{min-width:0;flex:1;padding:10px 8px;font-size:11px}
+  .modal-footer .spacer,.footer-step-label{display:none}
+  .clear-draft{display:none}
 }
 
 </style>
@@ -457,123 +514,186 @@ button{font:inherit}
 
 <nav class="mobile-cta"><a href="tel:08052410066">電話する</a><a href="https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E5%88%86%E7%9C%8C%E6%9D%B5%E7%AF%89%E5%B8%82%E5%A4%A7%E5%AD%97%E5%AE%88%E6%B1%9F1291-3" target="_blank" rel="noopener">地図を見る</a><button class="js-open-estimate" type="button">見積もり</button></nav>
 
+
 <div class="estimate-modal" id="estimateModal" aria-hidden="true">
   <div class="modal-backdrop" data-close-modal></div>
+
   <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="estimateTitle">
     <header class="modal-head">
       <p class="mini">WEB ESTIMATE REQUEST</p>
       <h2 id="estimateTitle">WEB見積もり・来店相談</h2>
-      <p>入力内容を確認後、メールアプリへ引き継ぎます。</p>
+      <p>3つの画面に分けて、入力内容を確認してから送信できます。</p>
       <button class="modal-close" type="button" aria-label="閉じる" data-close-modal>×</button>
     </header>
 
-    <form class="estimate-form" id="estimateForm" novalidate>
-      <div class="form-step"><span>1</span>車両とご相談内容を入力してください。<em class="draft-status" id="draftStatus"></em></div>
-
-      <div class="form-grid">
-        <div class="field">
-          <label for="kind">ご相談内容 <b class="req">必須</b></label>
-          <select id="kind" name="kind" required>
-            <option value="">選択してください</option>
-            <option>車検・点検</option>
-            <option>故障・不調の相談</option>
-            <option>オイル交換・メンテナンス</option>
-            <option>持込パーツ取付</option>
-            <option>カスタム・チューニング</option>
-            <option>その他</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="contactMethod">希望する連絡方法</label>
-          <select id="contactMethod" name="contactMethod">
-            <option>電話</option>
-            <option>メール</option>
-            <option>どちらでもよい</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="customerName">お名前 <b class="req">必須</b></label>
-          <input id="customerName" name="customerName" autocomplete="name" required>
-        </div>
-        <div class="field">
-          <label for="phone">電話番号 <b class="req">必須</b></label>
-          <input id="phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="例：090-1234-5678" required>
-        </div>
-
-        <div class="field">
-          <label for="email">メールアドレス</label>
-          <input id="email" name="email" type="email" autocomplete="email" placeholder="例：sample@example.com">
-        </div>
-        <div class="field">
-          <label for="preferredTime">連絡しやすい時間帯</label>
-          <select id="preferredTime" name="preferredTime">
-            <option>指定なし</option>
-            <option>9:00〜12:00</option>
-            <option>12:00〜15:00</option>
-            <option>15:00〜19:00</option>
-            <option>19:00以降（応相談）</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="carMaker">メーカー</label>
-          <input id="carMaker" name="carMaker" placeholder="例：トヨタ">
-        </div>
-        <div class="field">
-          <label for="carModel">車種</label>
-          <input id="carModel" name="carModel" placeholder="例：86">
-        </div>
-
-        <div class="field">
-          <label for="carYear">年式</label>
-          <input id="carYear" name="carYear" placeholder="例：2020年">
-        </div>
-        <div class="field">
-          <label for="visitDate">希望来店日</label>
-          <input id="visitDate" name="visitDate" type="date">
-          <small>確定予約ではありません。店舗からの確認後に確定します。</small>
-        </div>
-
-        <div class="field full">
-          <label for="partsInfo">持込部品・商品URL・型番</label>
-          <input id="partsInfo" name="partsInfo" placeholder="持込部品がある場合に入力してください">
-        </div>
-
-        <div class="field full">
-          <label for="message">症状・ご希望・ご相談内容 <b class="req">必須</b></label>
-          <textarea id="message" name="message" placeholder="いつから、どのような症状があるか／希望する作業内容などをご入力ください。" required></textarea>
-          <small>写真がある場合は、メールアプリが開いた後に添付してください。</small>
-        </div>
-      </div>
-
-      <label class="form-check">
-        <input id="privacyAgree" type="checkbox" required>
-        <span>入力内容を見積もり・相談対応のために利用することに同意します。入力内容はこのページから自動送信されず、メールアプリへ引き継がれます。</span>
-      </label>
-
-      <div class="form-error" id="formError">必須項目を確認してください。</div>
-
-      <div class="form-actions">
-        <button class="btn btn-primary" type="submit">メールアプリで送信</button>
-        <button class="btn btn-copy" id="copyEstimate" type="button">入力内容をコピー</button>
-        <button class="btn btn-copy" id="clearDraft" type="button">入力をクリア</button>
-      </div>
-
-      <p class="form-help">
-        メールアプリが設定されていない端末では送信画面が開かないことがあります。その場合は「入力内容をコピー」して、電話や普段お使いのメールへ貼り付けてください。
-      </p>
-
-      <div class="line-guide">
-        LINE公式アカウントのURLを確認でき次第、「LINEで相談」ボタンも同じ入力内容と連動できます。
-      </div>
-    </form>
-
-    <div class="modal-result" id="modalResult">
-      <h3>送信内容を準備しました</h3>
-      <p>メールアプリが開かない場合は、下の内容をコピーしてご利用ください。</p>
-      <div class="result-preview" id="resultPreview"></div>
+    <div class="stepper" aria-label="入力の進行状況">
+      <div class="stepper-item active" data-step-indicator="1"><span class="step-number">1</span><span>お客様・車両</span></div>
+      <div class="stepper-item" data-step-indicator="2"><span class="step-number">2</span><span>ご相談内容</span></div>
+      <div class="stepper-item" data-step-indicator="3"><span class="step-number">3</span><span>送信前確認</span></div>
     </div>
+
+    <form class="estimate-form" id="estimateForm" novalidate>
+      <div class="modal-scroll" id="modalScroll">
+
+        <section class="step-panel active" data-step-panel="1">
+          <div class="panel-title">
+            <div>
+              <h3>お客様・車両情報</h3>
+              <p>連絡先と分かる範囲の車両情報をご入力ください。</p>
+            </div>
+            <em class="draft-status" id="draftStatus"></em>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="customerName">お名前 <b class="req">必須</b></label>
+              <input id="customerName" name="customerName" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="phone">電話番号 <b class="req">必須</b></label>
+              <input id="phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="例：090-1234-5678" required>
+            </div>
+
+            <div class="field">
+              <label for="email">メールアドレス</label>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="例：sample@example.com">
+            </div>
+            <div class="field">
+              <label for="contactMethod">希望する連絡方法</label>
+              <select id="contactMethod" name="contactMethod">
+                <option>電話</option>
+                <option>メール</option>
+                <option>どちらでもよい</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="preferredTime">連絡しやすい時間帯</label>
+              <select id="preferredTime" name="preferredTime">
+                <option>指定なし</option>
+                <option>9:00〜12:00</option>
+                <option>12:00〜15:00</option>
+                <option>15:00〜19:00</option>
+                <option>19:00以降（応相談）</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="carMaker">メーカー</label>
+              <input id="carMaker" name="carMaker" placeholder="例：トヨタ">
+            </div>
+
+            <div class="field">
+              <label for="carModel">車種</label>
+              <input id="carModel" name="carModel" placeholder="例：86">
+            </div>
+            <div class="field">
+              <label for="carYear">年式</label>
+              <input id="carYear" name="carYear" placeholder="例：2020年">
+            </div>
+          </div>
+
+          <div class="form-error" data-step-error="1">お名前と電話番号を確認してください。</div>
+        </section>
+
+        <section class="step-panel" data-step-panel="2">
+          <div class="panel-title">
+            <div>
+              <h3>ご相談内容</h3>
+              <p>症状、希望する作業、持込部品などをご入力ください。</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="kind">ご相談内容 <b class="req">必須</b></label>
+              <select id="kind" name="kind" required>
+                <option value="">選択してください</option>
+                <option>車検・点検</option>
+                <option>故障・不調の相談</option>
+                <option>オイル交換・メンテナンス</option>
+                <option>持込パーツ取付</option>
+                <option>カスタム・チューニング</option>
+                <option>その他</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="visitDate">希望来店日</label>
+              <input id="visitDate" name="visitDate" type="date">
+              <small>確定予約ではありません。店舗からの確認後に確定します。</small>
+            </div>
+
+            <div class="field full">
+              <label for="partsInfo">持込部品・商品URL・型番</label>
+              <input id="partsInfo" name="partsInfo" placeholder="持込部品がある場合に入力してください">
+            </div>
+
+            <div class="field full">
+              <label for="message">症状・ご希望・ご相談内容 <b class="req">必須</b></label>
+              <textarea id="message" name="message" placeholder="いつから、どのような症状があるか／希望する作業内容などをご入力ください。" required></textarea>
+              <small>写真がある場合は、メールアプリが開いた後に添付してください。</small>
+            </div>
+          </div>
+
+          <label class="form-check">
+            <input id="privacyAgree" name="privacyAgree" type="checkbox" required>
+            <span>入力内容を見積もり・相談対応のために利用することに同意します。入力内容はこのページから自動送信されず、メールアプリへ引き継がれます。</span>
+          </label>
+
+          <div class="line-guide">
+            LINE公式URL確認後は、この入力内容をLINE相談へ引き継ぐ構成にも変更できます。
+          </div>
+
+          <div class="form-error" data-step-error="2">ご相談内容、詳しい内容、同意欄を確認してください。</div>
+        </section>
+
+        <section class="step-panel" data-step-panel="3">
+          <div class="panel-title">
+            <div>
+              <h3>送信前の確認</h3>
+              <p>内容を確認し、修正があれば「戻る」を押してください。</p>
+            </div>
+          </div>
+
+          <div class="confirm-grid">
+            <section class="confirm-card">
+              <h4>お客様情報</h4>
+              <dl class="confirm-list" id="confirmCustomer"></dl>
+            </section>
+
+            <section class="confirm-card">
+              <h4>車両情報</h4>
+              <dl class="confirm-list" id="confirmCar"></dl>
+            </section>
+
+            <section class="confirm-card full">
+              <h4>ご相談内容</h4>
+              <dl class="confirm-list" id="confirmRequest"></dl>
+            </section>
+          </div>
+
+          <p class="confirm-notice">
+            「メールアプリで送信」を押すと、端末のメールアプリに宛先・件名・本文を引き継ぎます。最終的な送信操作はメールアプリ内で行います。
+          </p>
+
+          <div class="modal-result" id="modalResult">
+            <h4>送信内容を準備しました</h4>
+            <p>メールアプリが開かない場合は、下の内容をコピーしてご利用ください。</p>
+            <div class="result-preview" id="resultPreview"></div>
+          </div>
+        </section>
+      </div>
+
+      <footer class="modal-footer">
+        <button class="clear-draft" id="clearDraft" type="button">入力をすべてクリア</button>
+        <span class="footer-step-label" id="footerStepLabel">1 / 3</span>
+        <span class="spacer"></span>
+        <button class="btn btn-secondary" id="backStep" type="button" hidden>戻る</button>
+        <button class="btn btn-primary" id="nextStep" type="button">次へ</button>
+        <button class="btn btn-copy" id="copyEstimate" type="button" hidden>内容をコピー</button>
+        <button class="btn btn-mail" id="sendEstimate" type="submit" hidden>メールアプリで送信</button>
+      </footer>
+    </form>
   </section>
 </div>
 
@@ -582,19 +702,28 @@ button{font:inherit}
 (() => {
   'use strict';
 
-  const CONTACT_EMAIL = 'dpromstk2000@gmail.com'; // 現在のGoogle Sites問い合わせ先。正式契約時に変更可能。
-  const LINE_URL = ''; // LINE公式URLを受領後に設定。
-  const DRAFT_KEY = 'wanganEstimateDraftV1';
+  const CONTACT_EMAIL = 'dpromstk2000@gmail.com';
+  const LINE_URL = '';
+  const DRAFT_KEY = 'wanganEstimateDraftV2';
 
   const menu = document.querySelector('.menu');
   const nav = document.querySelector('.nav');
   const toast = document.querySelector('.toast');
   const modal = document.getElementById('estimateModal');
   const form = document.getElementById('estimateForm');
-  const formError = document.getElementById('formError');
+  const modalScroll = document.getElementById('modalScroll');
   const draftStatus = document.getElementById('draftStatus');
-  const modalResult = document.getElementById('modalResult');
+  const footerStepLabel = document.getElementById('footerStepLabel');
+  const backButton = document.getElementById('backStep');
+  const nextButton = document.getElementById('nextStep');
+  const copyButton = document.getElementById('copyEstimate');
+  const sendButton = document.getElementById('sendEstimate');
+  const resultBox = document.getElementById('modalResult');
   const resultPreview = document.getElementById('resultPreview');
+
+  let currentStep = 1;
+  let lastFocusedElement = null;
+  let modalTop = 0;
 
   const showToast = (message) => {
     toast.textContent = message;
@@ -616,17 +745,31 @@ button{font:inherit}
     });
   });
 
+  const setMinDate = () => {
+    const dateInput = document.getElementById('visitDate');
+    if (!dateInput) return;
+    const now = new Date();
+    const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+    dateInput.min = local.toISOString().slice(0, 10);
+  };
+
   const openModal = () => {
+    lastFocusedElement = document.activeElement;
+    modalTop = window.scrollY;
+    modal.style.top = `${modalTop}px`;
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    window.setTimeout(() => document.getElementById('kind')?.focus(), 50);
+    showStep(1, false);
+    window.setTimeout(() => document.getElementById('customerName')?.focus(), 60);
   };
 
   const closeModal = () => {
     modal.classList.remove('open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    modal.style.top = '';
+    lastFocusedElement?.focus?.();
   };
 
   document.querySelectorAll('.js-open-estimate').forEach((button) => button.addEventListener('click', openModal));
@@ -636,15 +779,111 @@ button{font:inherit}
     if (event.key === 'Escape' && modal.classList.contains('open')) closeModal();
   });
 
-  const setMinDate = () => {
-    const dateInput = document.getElementById('visitDate');
-    if (!dateInput) return;
-    const now = new Date();
-    const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-    dateInput.min = local.toISOString().slice(0, 10);
+  const getFormData = () => {
+    const data = Object.fromEntries(new FormData(form).entries());
+    data.privacyAgree = document.getElementById('privacyAgree').checked ? '同意済み' : '';
+    return data;
   };
 
-  const getFormData = () => Object.fromEntries(new FormData(form).entries());
+  const setFieldInvalid = (field, invalid) => {
+    if (!field) return;
+    field.setAttribute('aria-invalid', invalid ? 'true' : 'false');
+  };
+
+  const validateStep = (step) => {
+    const panel = document.querySelector(`[data-step-panel="${step}"]`);
+    const error = document.querySelector(`[data-step-error="${step}"]`);
+    if (!panel) return true;
+
+    let valid = true;
+    panel.querySelectorAll('[required]').forEach((field) => {
+      const okay = field.type === 'checkbox' ? field.checked : field.checkValidity();
+      setFieldInvalid(field, !okay);
+      if (!okay) valid = false;
+    });
+
+    if (!valid) {
+      error?.classList.add('show');
+      const firstInvalid = panel.querySelector('[aria-invalid="true"]');
+      firstInvalid?.focus();
+    } else {
+      error?.classList.remove('show');
+    }
+    return valid;
+  };
+
+  const pair = (label, value, className = '') =>
+    `<div><dt>${label}</dt><dd class="${className}">${escapeHtml(value || '未入力')}</dd></div>`;
+
+  const escapeHtml = (value) => String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+
+  const updateConfirmation = () => {
+    const d = getFormData();
+
+    document.getElementById('confirmCustomer').innerHTML = [
+      pair('お名前', d.customerName),
+      pair('電話番号', d.phone),
+      pair('メール', d.email),
+      pair('希望連絡方法', d.contactMethod),
+      pair('連絡時間帯', d.preferredTime)
+    ].join('');
+
+    document.getElementById('confirmCar').innerHTML = [
+      pair('メーカー', d.carMaker),
+      pair('車種', d.carModel),
+      pair('年式', d.carYear),
+      pair('希望来店日', d.visitDate || '指定なし')
+    ].join('');
+
+    document.getElementById('confirmRequest').innerHTML = [
+      pair('相談分類', d.kind),
+      pair('持込部品等', d.partsInfo || 'なし'),
+      pair('詳しい内容', d.message, 'confirm-message'),
+      pair('個人情報利用', d.privacyAgree)
+    ].join('');
+  };
+
+  const showStep = (step, focus = true) => {
+    currentStep = Math.max(1, Math.min(3, step));
+
+    document.querySelectorAll('[data-step-panel]').forEach((panel) => {
+      panel.classList.toggle('active', Number(panel.dataset.stepPanel) === currentStep);
+    });
+
+    document.querySelectorAll('[data-step-indicator]').forEach((indicator) => {
+      const indicatorStep = Number(indicator.dataset.stepIndicator);
+      indicator.classList.toggle('active', indicatorStep === currentStep);
+      indicator.classList.toggle('done', indicatorStep < currentStep);
+    });
+
+    backButton.hidden = currentStep === 1;
+    nextButton.hidden = currentStep === 3;
+    copyButton.hidden = currentStep !== 3;
+    sendButton.hidden = currentStep !== 3;
+    footerStepLabel.textContent = `${currentStep} / 3`;
+
+    if (currentStep === 3) updateConfirmation();
+
+    modalScroll.scrollTop = 0;
+    resultBox.classList.remove('show');
+
+    if (focus) {
+      const panel = document.querySelector(`[data-step-panel="${currentStep}"]`);
+      window.setTimeout(() => panel?.querySelector('input,select,textarea,button')?.focus(), 30);
+    }
+  };
+
+  nextButton?.addEventListener('click', () => {
+    if (!validateStep(currentStep)) return;
+    showStep(currentStep + 1);
+  });
+
+  backButton?.addEventListener('click', () => showStep(currentStep - 1));
 
   const buildMessage = () => {
     const d = getFormData();
@@ -669,14 +908,15 @@ button{font:inherit}
       '',
       `送信日時：${new Date().toLocaleString('ja-JP')}`,
       `送信元ページ：${location.href}`
-    ].join('\n');
+    ].join('
+');
   };
 
   const saveDraft = () => {
     const data = getFormData();
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
-      draftStatus.textContent = '入力内容を端末内に一時保存しました';
+      draftStatus.textContent = '端末内へ一時保存済み';
     } catch (_) {
       draftStatus.textContent = '';
     }
@@ -687,47 +927,61 @@ button{font:inherit}
       const raw = localStorage.getItem(DRAFT_KEY);
       if (!raw) return;
       const data = JSON.parse(raw);
+
       Object.entries(data).forEach(([name, value]) => {
-        const el = form.elements.namedItem(name);
-        if (el && typeof value === 'string') el.value = value;
+        const field = form.elements.namedItem(name);
+        if (!field) return;
+        if (field.type === 'checkbox') {
+          field.checked = Boolean(value);
+        } else if (typeof value === 'string') {
+          field.value = value;
+        }
       });
+
       draftStatus.textContent = '前回の入力内容を復元しました';
     } catch (_) {}
   };
 
   let saveTimer;
-  form?.addEventListener('input', () => {
+  form?.addEventListener('input', (event) => {
+    setFieldInvalid(event.target, false);
+    event.target.closest('.step-panel')?.querySelector('.form-error')?.classList.remove('show');
     window.clearTimeout(saveTimer);
     saveTimer = window.setTimeout(saveDraft, 400);
-    formError.classList.remove('show');
+  });
+
+  form?.addEventListener('change', (event) => {
+    setFieldInvalid(event.target, false);
+    window.clearTimeout(saveTimer);
+    saveTimer = window.setTimeout(saveDraft, 250);
   });
 
   form?.addEventListener('submit', (event) => {
     event.preventDefault();
 
-    const requiredOkay = form.checkValidity();
-    const agreed = document.getElementById('privacyAgree').checked;
-    if (!requiredOkay || !agreed) {
-      formError.classList.add('show');
-      form.reportValidity();
+    const step1Okay = validateStep(1);
+    const step2Okay = validateStep(2);
+    if (!step1Okay || !step2Okay) {
+      showStep(!step1Okay ? 1 : 2);
       return;
     }
 
     const message = buildMessage();
     resultPreview.textContent = message;
-    modalResult.classList.add('show');
+    resultBox.classList.add('show');
 
-    const data = getFormData();
-    const subject = `【WEB相談】${data.kind || '車の相談'}／${data.customerName || 'お客様'}`;
+    const d = getFormData();
+    const subject = `【WEB相談】${d.kind || '車の相談'}／${d.customerName || 'お客様'}`;
     const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
     window.location.href = mailto;
     showToast('メールアプリへ送信内容を引き継ぎました。');
   });
 
-  document.getElementById('copyEstimate')?.addEventListener('click', async () => {
+  copyButton?.addEventListener('click', async () => {
     const message = buildMessage();
     resultPreview.textContent = message;
-    modalResult.classList.add('show');
+    resultBox.classList.add('show');
+
     try {
       await navigator.clipboard.writeText(message);
       showToast('入力内容をコピーしました。');
@@ -746,8 +1000,10 @@ button{font:inherit}
     if (!window.confirm('入力内容をすべて消去しますか？')) return;
     form.reset();
     localStorage.removeItem(DRAFT_KEY);
-    modalResult.classList.remove('show');
     draftStatus.textContent = '入力内容をクリアしました';
+    document.querySelectorAll('[aria-invalid="true"]').forEach((field) => setFieldInvalid(field, false));
+    document.querySelectorAll('.form-error').forEach((error) => error.classList.remove('show'));
+    showStep(1, false);
     setMinDate();
   });
 
@@ -764,6 +1020,7 @@ button{font:inherit}
 
   setMinDate();
   loadDraft();
+  showStep(1, false);
 })();
 </script>
 </body>
