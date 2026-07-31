@@ -379,6 +379,72 @@ button{font:inherit}
   .direct-badge{display:flex;width:max-content;margin:8px 0 0}
 }
 
+
+/* STEP WANGAN-WEB-7: completion UX / duplicate guard / environment switch */
+.environment-chip{
+  display:inline-flex;align-items:center;gap:7px;padding:5px 8px;margin-left:7px;
+  border:1px solid rgba(242,197,21,.36);background:rgba(242,197,21,.11);
+  color:#ffe682;font-size:9px;font-weight:1000;letter-spacing:.08em;vertical-align:middle
+}
+.environment-chip.production{
+  border-color:rgba(22,183,90,.38);background:rgba(22,183,90,.12);color:#c9ffdc
+}
+.api-result.completion{
+  padding:25px 23px;text-align:center;background:
+    radial-gradient(circle at 50% 0,rgba(22,183,90,.13),transparent 48%),#fff
+}
+.completion-icon{
+  width:64px;height:64px;margin:0 auto 15px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(22,183,90,.13);
+  border:2px solid rgba(22,183,90,.42);color:#148649;font-size:35px;font-weight:1000
+}
+.api-result.completion h4{font-size:24px;margin-bottom:8px}
+.api-result.completion p{max-width:610px;margin-inline:auto;font-size:12px;line-height:1.75}
+.api-result.completion .api-reference{
+  width:min(560px,100%);margin:17px auto 0;padding:13px 15px;
+  border-left:5px solid var(--yellow);background:#11161c;text-align:left
+}
+.completion-flow{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:19px auto 0;
+  width:min(620px,100%);text-align:left
+}
+.completion-flow div{padding:13px;background:#f3f5f6;border:1px solid #dde2e5}
+.completion-flow b{display:block;color:#8a6d00;font-size:10px;margin-bottom:4px}
+.completion-flow span{font-size:11px;color:#4f5961}
+.completion-caution{
+  width:min(620px,100%);margin:13px auto 0;padding:11px 13px;
+  background:#fff6cf;border-left:4px solid var(--yellow);color:#65582d;font-size:10px;text-align:left
+}
+.modal-panel.completed .stepper-item{color:#171b20}
+.modal-panel.completed .stepper-item .step-number{background:#171b20;color:#fff}
+.modal-panel.completed .stepper-item::after{background:#171b20}
+.modal-panel.completed .confirm-grid,
+.modal-panel.completed .confirm-notice,
+.modal-panel.completed .modal-result{display:none}
+.modal-panel.completed .modal-footer .clear-draft,
+.modal-panel.completed .modal-footer .footer-step-label,
+.modal-panel.completed .modal-footer .spacer{display:none}
+.modal-panel.completed .modal-footer{justify-content:center}
+.duplicate-panel{
+  padding:17px;background:#fff7d7;border-left:5px solid var(--yellow);
+  color:#625529;text-align:left
+}
+.duplicate-panel strong{display:block;color:#322b11;font-size:15px;margin-bottom:5px}
+.btn-success-close{background:#11161c;color:#fff;border-color:#11161c}
+.btn-new-request{background:#fff;color:#222;border-color:#bfc6cb}
+.btn-phone{background:var(--yellow);color:#111;border-color:var(--yellow)}
+.source-label{
+  display:inline-flex;padding:4px 8px;margin-left:7px;background:#101419;color:#fff;
+  font-size:9px;font-weight:1000;letter-spacing:.06em
+}
+@media(max-width:760px){
+  .completion-flow{grid-template-columns:1fr}
+  .api-result.completion{padding:21px 15px}
+  .api-result.completion h4{font-size:21px}
+  .modal-panel.completed .modal-footer{display:grid;grid-template-columns:1fr 1fr}
+  .modal-panel.completed .modal-footer .btn-phone{grid-column:1/-1}
+}
+
 </style>
 </head>
 <body>
@@ -548,7 +614,10 @@ button{font:inherit}
       <p class="kicker">CONTACT &amp; ESTIMATE</p>
       <h2>愛車のこと、まずは気軽にご相談ください。</h2>
       <p>WEBフォームから送信すると、内容がDPRO管理画面へ直接登録されます。希望日を選ぶと、DPROの受付可能な30分枠を読み込みます。</p>
-      <div class="actions"><a class="btn btn-primary" href="tel:08052410066">電話で相談　080-5241-0066</a><button class="btn btn-ghost js-open-estimate" type="button">DPRO WEB受付を開く</button><button class="btn btn-line js-line" type="button">LINEで相談</button></div><div class="dpro-site-note"><b>DPRO DEMO連動</b>　WEB受付内容を店舗管理画面へまとめて登録します。</div>
+      <div class="actions"><a class="btn btn-primary" href="tel:08052410066">電話で相談　080-5241-0066</a><button class="btn btn-ghost js-open-estimate" type="button">DPRO WEB受付を開く</button><button class="btn btn-line js-line" type="button">LINEで相談</button></div><div class="dpro-site-note" id="environmentNote">
+  <b id="environmentLabel">DPRO DEMO連動</b>
+  <span id="environmentText">WEB受付内容を店舗管理画面へまとめて登録します。</span>
+</div>
     </div>
   </section>
 </main>
@@ -572,7 +641,10 @@ button{font:inherit}
       <p class="mini">WEB ESTIMATE REQUEST</p>
       <h2 id="estimateTitle">WEB見積もり・来店相談</h2>
       <p>3つの画面に分けて入力し、DPRO管理画面へ直接受付を登録します。</p>
-      <div class="api-status checking" id="apiStatus"><i></i><span id="apiStatusText">DPRO DEMO 接続確認中</span></div>
+      <div class="api-status checking" id="apiStatus">
+  <i></i><span id="apiStatusText">DPRO 接続確認中</span>
+  <span class="environment-chip" id="environmentChip">DEMO</span>
+</div>
       <button class="modal-close" type="button" aria-label="閉じる" data-close-modal>×</button>
     </header>
 
@@ -770,9 +842,18 @@ button{font:inherit}
           </p>
 
           <div class="api-result" id="apiResult" role="status" aria-live="polite">
+            <div class="completion-icon" id="completionIcon" hidden>✓</div>
             <h4 id="apiResultTitle">DPRO受付結果</h4>
             <p id="apiResultText"></p>
             <div class="api-reference" id="apiReference"></div>
+            <div class="completion-flow" id="completionFlow" hidden>
+              <div><b>01　WEB受付完了</b><span>DPRO管理画面へ受付内容を登録しました。</span></div>
+              <div><b>02　店舗で内容確認</b><span>車両・作業内容・希望日時をスタッフが確認します。</span></div>
+              <div><b>03　正式日時をご連絡</b><span>店舗からの連絡をもって入庫日時が確定します。</span></div>
+            </div>
+            <div class="completion-caution" id="completionCaution" hidden>
+              希望日時はまだ確定していません。緊急の場合や連絡を急ぐ場合は、080-5241-0066へお電話ください。
+            </div>
             <div class="api-fallback" id="apiFallback">
               DPROへ送信できなかった場合でも、下の「内容をコピー」または「メールで送信」を利用できます。
             </div>
@@ -795,6 +876,9 @@ button{font:inherit}
         <button class="btn btn-copy" id="copyEstimate" type="button" hidden>内容をコピー</button>
         <button class="btn btn-mail-alt" id="mailEstimate" type="button" hidden>メールで送信</button>
         <button class="btn btn-dpro" id="sendEstimate" type="submit" hidden>DPROへ受付送信</button>
+        <a class="btn btn-phone" id="successPhone" href="tel:08052410066" hidden>店舗へ電話する</a>
+        <button class="btn btn-new-request" id="newRequest" type="button" hidden>別の相談を入力</button>
+        <button class="btn btn-success-close" id="closeSuccess" type="button" hidden>受付画面を閉じる</button>
       </footer>
     </form>
   </section>
@@ -805,11 +889,26 @@ button{font:inherit}
 (() => {
   'use strict';
 
-  const WORKER_API_BASE = 'https://ksh-line-demo-api.dpromstk2000.workers.dev';
-  const SHOP_CODE = 'street_house_kitsuki';
-  const CONTACT_EMAIL = 'dpromstk2000@gmail.com';
-  const LINE_URL = '';
-  const DRAFT_KEY = 'wanganEstimateDraftV3';
+  // 正式公開時は、このAPP_CONFIGだけを変更します。
+  const APP_CONFIG = Object.freeze({
+    environment: 'demo',
+    workerApiBase: 'https://ksh-line-demo-api.dpromstk2000.workers.dev',
+    shopCode: 'street_house_kitsuki',
+    contactEmail: 'dpromstk2000@gmail.com',
+    lineUrl: '',
+    source: 'WEB',
+    sourceDetail: 'street-house-wangan',
+    duplicateWindowMs: 10 * 60 * 1000
+  });
+
+  const WORKER_API_BASE = APP_CONFIG.workerApiBase;
+  const SHOP_CODE = APP_CONFIG.shopCode;
+  const CONTACT_EMAIL = APP_CONFIG.contactEmail;
+  const LINE_URL = APP_CONFIG.lineUrl;
+  const IS_DEMO = APP_CONFIG.environment === 'demo';
+  const DRAFT_KEY = 'wanganEstimateDraftV4';
+  const REQUEST_ID_KEY = 'wanganCurrentRequestIdV1';
+  const LAST_SUBMISSION_KEY = 'wanganLastSubmissionV1';
 
   const menu = document.querySelector('.menu');
   const nav = document.querySelector('.nav');
@@ -833,6 +932,16 @@ button{font:inherit}
   const apiResultText = document.getElementById('apiResultText');
   const apiReference = document.getElementById('apiReference');
   const apiFallback = document.getElementById('apiFallback');
+  const completionIcon = document.getElementById('completionIcon');
+  const completionFlow = document.getElementById('completionFlow');
+  const completionCaution = document.getElementById('completionCaution');
+  const environmentChip = document.getElementById('environmentChip');
+  const environmentLabel = document.getElementById('environmentLabel');
+  const environmentText = document.getElementById('environmentText');
+  const modalPanel = modal.querySelector('.modal-panel');
+  const successPhone = document.getElementById('successPhone');
+  const newRequestButton = document.getElementById('newRequest');
+  const closeSuccessButton = document.getElementById('closeSuccess');
   const visitDate = document.getElementById('visitDate');
   const preferredVisitTime = document.getElementById('preferredVisitTime');
   const slotStatus = document.getElementById('slotStatus');
@@ -842,6 +951,7 @@ button{font:inherit}
   let modalTop = 0;
   let apiConnected = false;
   let isSubmitting = false;
+  let submissionCompleted = false;
 
   const showToast = (message) => {
     toast.textContent = message;
@@ -863,6 +973,17 @@ button{font:inherit}
     });
   });
 
+  const applyEnvironmentDisplay = () => {
+    environmentChip.textContent = IS_DEMO ? 'DEMO' : 'PRODUCTION';
+    environmentChip.classList.toggle('production', !IS_DEMO);
+    environmentLabel.textContent = IS_DEMO ? 'DPRO DEMO連動' : 'DPRO正式運用連動';
+    environmentText.textContent = IS_DEMO
+      ? 'デモ環境の店舗管理画面へWEB受付を登録します。'
+      : '店舗の正式なDPRO管理画面へWEB受付を登録します。';
+  };
+
+  const environmentName = () => IS_DEMO ? 'DPRO DEMO' : 'DPRO';
+
   const setApiStatus = (state, text) => {
     apiStatus.classList.remove('checking', 'connected', 'failed');
     apiStatus.classList.add(state);
@@ -870,7 +991,7 @@ button{font:inherit}
   };
 
   const checkDproConnection = async () => {
-    setApiStatus('checking', 'DPRO DEMO 接続確認中');
+    setApiStatus('checking', `${environmentName()} 接続確認中`);
     try {
       const response = await fetch(
         `${WORKER_API_BASE}/api/public/shop-settings?shopCode=${encodeURIComponent(SHOP_CODE)}`,
@@ -880,7 +1001,7 @@ button{font:inherit}
       if (!response.ok || !result.ok) throw new Error(result.message || '接続できませんでした。');
       apiConnected = true;
       const shopName = result.shop_name || result.shop_settings?.shop_name || 'ストリートハウス湾岸通り';
-      setApiStatus('connected', `DPRO DEMO 接続済み｜${shopName}`);
+      setApiStatus('connected', `${environmentName()} 接続済み｜${shopName}`);
     } catch (error) {
       apiConnected = false;
       setApiStatus('failed', 'DPRO接続を確認できません｜メール・コピーは利用可能');
@@ -998,9 +1119,16 @@ button{font:inherit}
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    showStep(1, false);
+    if (submissionCompleted) {
+      showStep(3, false);
+      modalPanel.classList.add('completed');
+    } else {
+      showStep(1, false);
+    }
     checkDproConnection();
-    window.setTimeout(() => document.getElementById('customerName')?.focus(), 60);
+    window.setTimeout(() => {
+      if (!submissionCompleted) document.getElementById('customerName')?.focus();
+    }, 60);
   };
 
   const closeModal = () => {
@@ -1096,6 +1224,10 @@ button{font:inherit}
     apiReference.className = 'api-reference';
     apiReference.textContent = '';
     apiFallback.className = 'api-fallback';
+    completionIcon.hidden = true;
+    completionFlow.hidden = true;
+    completionCaution.hidden = true;
+    apiResult.classList.remove('completion');
   };
 
   const showStep = (step, focus = true) => {
@@ -1113,18 +1245,22 @@ button{font:inherit}
 
     backButton.hidden = currentStep === 1;
     nextButton.hidden = currentStep === 3;
-    copyButton.hidden = currentStep !== 3;
-    mailButton.hidden = currentStep !== 3;
-    sendButton.hidden = currentStep !== 3;
+    const normalConfirmation = currentStep === 3 && !submissionCompleted;
+    copyButton.hidden = !normalConfirmation;
+    mailButton.hidden = !normalConfirmation;
+    sendButton.hidden = !normalConfirmation;
+    successPhone.hidden = !submissionCompleted;
+    newRequestButton.hidden = !submissionCompleted;
+    closeSuccessButton.hidden = !submissionCompleted;
     footerStepLabel.textContent = `${currentStep} / 3`;
 
     if (currentStep === 3) {
       updateConfirmation();
       resultPreview.textContent = buildMessage();
-      resultBox.classList.add('show');
+      resultBox.classList.toggle('show', !submissionCompleted);
     } else {
       resultBox.classList.remove('show');
-      resetApiResult();
+      if (!submissionCompleted) resetApiResult();
     }
 
     modalScroll.scrollTop = 0;
@@ -1165,6 +1301,59 @@ button{font:inherit}
     ].join('\n');
   };
 
+  const getOrCreateRequestId = () => {
+    let requestId = localStorage.getItem(REQUEST_ID_KEY);
+    if (!requestId) {
+      requestId = crypto.randomUUID
+        ? crypto.randomUUID()
+        : `web-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+      localStorage.setItem(REQUEST_ID_KEY, requestId);
+    }
+    return requestId;
+  };
+
+  const simpleHash = (text) => {
+    let hash = 2166136261;
+    for (let index = 0; index < text.length; index += 1) {
+      hash ^= text.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return (hash >>> 0).toString(16);
+  };
+
+  const submissionFingerprint = (payload) => simpleHash(JSON.stringify({
+    shopCode: payload.shopCode,
+    name: payload.name.trim().toLowerCase(),
+    phone: payload.phone.replace(/\D/g, ''),
+    carName: payload.carName.trim().toLowerCase(),
+    consultType: payload.consultType,
+    preferredVisitDate: payload.preferredVisitDate,
+    preferredVisitTime: payload.preferredVisitTime,
+    message: payload.message.trim()
+  }));
+
+  const readRecentSubmission = (fingerprint) => {
+    try {
+      const stored = JSON.parse(localStorage.getItem(LAST_SUBMISSION_KEY) || 'null');
+      if (!stored || stored.fingerprint !== fingerprint) return null;
+      if (Date.now() - Number(stored.submittedAt || 0) > APP_CONFIG.duplicateWindowMs) return null;
+      return stored;
+    } catch (_) {
+      return null;
+    }
+  };
+
+  const saveSuccessfulSubmission = (payload, reference) => {
+    try {
+      localStorage.setItem(LAST_SUBMISSION_KEY, JSON.stringify({
+        fingerprint: submissionFingerprint(payload),
+        submittedAt: Date.now(),
+        reference: reference || '',
+        requestId: payload.clientRequestId
+      }));
+    } catch (_) {}
+  };
+
   const buildDproPayload = () => {
     const d = getFormData();
     const carName = [d.carMaker, d.carModel].filter(Boolean).join(' ').trim();
@@ -1190,9 +1379,13 @@ button{font:inherit}
       shakenYear: d.shakenYear || '', shakenMonth: d.shakenMonth || '',
       mileageKm: String(d.mileageKm || '').trim(),
       message: additionalInfo,
-      customerMode: 'new', vehicleMode: 'new', source: 'WEB',
+      customerMode: 'new',
+      vehicleMode: 'new',
+      source: APP_CONFIG.source,
+      sourceDetail: APP_CONFIG.sourceDetail,
+      environment: APP_CONFIG.environment,
       pageUrl: window.location.href,
-      clientRequestId: crypto.randomUUID ? crypto.randomUUID() : `web-${Date.now()}`
+      clientRequestId: getOrCreateRequestId()
     };
   };
 
@@ -1243,23 +1436,46 @@ button{font:inherit}
     apiReference.className = 'api-reference';
   };
 
-  const showApiSuccess = (result) => {
-    const reference = result.inquiryId || result.inquiry_id || result.id ||
-      result.inquiry?.id || result.data?.id || result.requestId || '';
+  const extractReference = (result) =>
+    result.inquiryId || result.inquiry_id || result.id ||
+    result.inquiry?.id || result.data?.id || result.requestId || '';
 
-    apiResult.className = 'api-result show success';
-    apiResultTitle.textContent = 'DPROへのWEB受付が完了しました';
-    apiResultText.textContent = result.message ||
-      '店舗管理画面へ相談内容を登録しました。希望日時は仮受付のため、店舗からの連絡をお待ちください。';
+  const setCompletedView = ({ reference = '', duplicate = false } = {}) => {
+    submissionCompleted = true;
+    modalPanel.classList.add('completed');
+    apiResult.className = 'api-result show completion success';
+    completionIcon.hidden = false;
+    completionIcon.textContent = duplicate ? '!' : '✓';
+    completionFlow.hidden = duplicate;
+    completionCaution.hidden = false;
+    apiFallback.className = 'api-fallback';
+    resultBox.classList.remove('show');
+
+    apiResultTitle.textContent = duplicate
+      ? '同じ内容はすでに受付済みです'
+      : 'DPROへのWEB受付が完了しました';
+
+    apiResultText.textContent = duplicate
+      ? '短時間に同じ内容が再送されるのを防止しました。新しく受付を追加する必要はありません。'
+      : '店舗のDPRO管理画面へ内容を登録しました。スタッフが確認後、正式な入庫日時をご連絡します。';
 
     if (reference) {
-      apiReference.textContent = `受付参照：${reference}`;
+      apiReference.innerHTML =
+        `<span class="source-label">${escapeHtml(APP_CONFIG.source)}</span> ` +
+        `受付参照：${escapeHtml(reference)}`;
       apiReference.className = 'api-reference show';
     } else {
       apiReference.className = 'api-reference';
     }
 
-    apiFallback.className = 'api-fallback';
+    showStep(3, false);
+    modalScroll.scrollTop = modalScroll.scrollHeight;
+  };
+
+  const showApiSuccess = (result, payload) => {
+    const reference = extractReference(result);
+    saveSuccessfulSubmission(payload, reference);
+    setCompletedView({ reference });
     localStorage.removeItem(DRAFT_KEY);
     draftStatus.textContent = 'DPROへ受付済み';
   };
@@ -1281,11 +1497,27 @@ button{font:inherit}
     sendButton.textContent = 'DPROへ送信中...';
     resetApiResult();
 
+    const payload = buildDproPayload();
+    const fingerprint = submissionFingerprint(payload);
+    const recentSubmission = readRecentSubmission(fingerprint);
+
+    if (recentSubmission) {
+      setCompletedView({
+        reference: recentSubmission.reference || recentSubmission.requestId || '',
+        duplicate: true
+      });
+      sendButton.disabled = false;
+      sendButton.textContent = originalText;
+      isSubmitting = false;
+      showToast('二重送信を防止しました。受付はすでに完了しています。');
+      return;
+    }
+
     try {
       const response = await fetch(`${WORKER_API_BASE}/api/inquiries`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json', Accept: 'application/json'},
-        body: JSON.stringify(buildDproPayload())
+        body: JSON.stringify(payload)
       });
 
       const raw = await response.text();
@@ -1298,8 +1530,8 @@ button{font:inherit}
       }
 
       apiConnected = true;
-      setApiStatus('connected', 'DPRO DEMO 接続済み｜受付登録完了');
-      showApiSuccess(result);
+      setApiStatus('connected', `${environmentName()} 接続済み｜受付登録完了`);
+      showApiSuccess(result, payload);
       showToast('DPRO管理画面へ受付を登録しました。');
       modalScroll.scrollTop = modalScroll.scrollHeight;
     } catch (error) {
@@ -1310,8 +1542,10 @@ button{font:inherit}
       modalScroll.scrollTop = modalScroll.scrollHeight;
     } finally {
       isSubmitting = false;
-      sendButton.disabled = false;
-      sendButton.textContent = originalText;
+      if (!submissionCompleted) {
+        sendButton.disabled = false;
+        sendButton.textContent = originalText;
+      }
     }
   });
 
@@ -1340,10 +1574,35 @@ button{font:inherit}
     showToast('メールアプリへ送信内容を引き継ぎました。');
   });
 
+  const resetForNewRequest = () => {
+    submissionCompleted = false;
+    modalPanel.classList.remove('completed');
+    form.reset();
+    localStorage.removeItem(DRAFT_KEY);
+    localStorage.removeItem(REQUEST_ID_KEY);
+    draftStatus.textContent = '新しい相談を入力できます';
+    document.querySelectorAll('[aria-invalid="true"]').forEach((field) => setFieldInvalid(field, false));
+    document.querySelectorAll('.form-error').forEach((error) => error.classList.remove('show'));
+    resetTimeOptions();
+    slotStatus.className = 'slot-status';
+    slotStatus.textContent = 'DPROから30分枠を読み込みます。';
+    resetApiResult();
+    setMinDate();
+    populateShakenYears();
+    showStep(1, false);
+    window.setTimeout(() => document.getElementById('customerName')?.focus(), 40);
+  };
+
+  newRequestButton?.addEventListener('click', resetForNewRequest);
+  closeSuccessButton?.addEventListener('click', closeModal);
+
   document.getElementById('clearDraft')?.addEventListener('click', () => {
     if (!window.confirm('入力内容をすべて消去しますか？')) return;
     form.reset();
     localStorage.removeItem(DRAFT_KEY);
+    localStorage.removeItem(REQUEST_ID_KEY);
+    submissionCompleted = false;
+    modalPanel.classList.remove('completed');
     draftStatus.textContent = '入力内容をクリアしました';
     document.querySelectorAll('[aria-invalid="true"]').forEach((field) => setFieldInvalid(field, false));
     document.querySelectorAll('.form-error').forEach((error) => error.classList.remove('show'));
@@ -1364,6 +1623,7 @@ button{font:inherit}
     });
   });
 
+  applyEnvironmentDisplay();
   populateShakenYears();
   setMinDate();
   loadDraft();
