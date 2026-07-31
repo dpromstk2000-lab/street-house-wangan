@@ -330,6 +330,55 @@ button{font:inherit}
   .clear-draft{display:none}
 }
 
+
+/* STEP WANGAN-WEB-6: DPRO direct integration */
+.api-status{
+  display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:7px 10px;
+  border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);
+  color:#c9d0d6;font-size:10px;font-weight:900
+}
+.api-status i{width:8px;height:8px;border-radius:50%;background:#8d969e;box-shadow:0 0 0 4px rgba(141,150,158,.12)}
+.api-status.checking i{animation:pulseApi 1.2s infinite}
+.api-status.connected{border-color:rgba(22,183,90,.42);background:rgba(22,183,90,.10);color:#d4ffe3}
+.api-status.connected i{background:var(--green);box-shadow:0 0 0 4px rgba(22,183,90,.14)}
+.api-status.failed{border-color:rgba(214,65,65,.42);background:rgba(214,65,65,.10);color:#ffd7d7}
+.api-status.failed i{background:#d64141;box-shadow:0 0 0 4px rgba(214,65,65,.13)}
+@keyframes pulseApi{50%{opacity:.35}}
+.dpro-site-note{
+  display:inline-flex;align-items:center;gap:8px;margin-top:18px;padding:9px 12px;
+  border-left:4px solid var(--yellow);background:rgba(255,255,255,.07);
+  color:#d4d9dd;font-size:11px;font-weight:800
+}
+.dpro-site-note b{color:var(--yellow2)}
+.slot-status{min-height:19px;font-size:10px;font-weight:800;color:#6e7780}
+.slot-status.loading{color:#836a00}
+.slot-status.ok{color:#187744}
+.slot-status.ng{color:#b12d2d}
+.field-row-note{grid-column:1/-1;margin-top:-7px;padding:11px 13px;background:#fff7d4;border-left:4px solid var(--yellow);font-size:10px;color:#62572e}
+.btn-dpro{background:var(--yellow);color:#111;border-color:var(--yellow)}
+.btn-mail-alt{background:#fff;color:#24292d;border-color:#b9c1c6}
+.btn-dpro:disabled{opacity:.65;cursor:wait;transform:none}
+.api-result{display:none;margin-top:16px;padding:18px;border:1px solid #dce1e4;background:#fff}
+.api-result.show{display:block}
+.api-result.success{border-left:5px solid var(--green)}
+.api-result.failure{border-left:5px solid #d64141}
+.api-result h4{margin:0 0 6px;font-size:19px}
+.api-result p{margin:0;color:#5f6971;font-size:11px}
+.api-reference{display:none;margin-top:12px;padding:11px 13px;background:#101419;color:#fff;font-size:11px;font-weight:900;overflow-wrap:anywhere}
+.api-reference.show{display:block}
+.api-fallback{display:none;margin-top:13px;padding:13px 14px;background:#fff5d1;color:#66582c;font-size:11px}
+.api-fallback.show{display:block}
+.connection-detail{font-weight:500;opacity:.9}
+.direct-badge{
+  display:inline-flex;align-items:center;gap:7px;padding:6px 9px;margin-left:8px;
+  background:rgba(22,183,90,.13);border:1px solid rgba(22,183,90,.35);
+  color:#bfffd5;font-size:9px;font-weight:1000;vertical-align:middle
+}
+@media(max-width:760px){
+  .api-status{max-width:100%;line-height:1.4}
+  .direct-badge{display:flex;width:max-content;margin:8px 0 0}
+}
+
 </style>
 </head>
 <body>
@@ -498,8 +547,8 @@ button{font:inherit}
     <div class="shell contact-inner">
       <p class="kicker">CONTACT &amp; ESTIMATE</p>
       <h2>愛車のこと、まずは気軽にご相談ください。</h2>
-      <p>車種・症状・ご希望の作業内容をWEBフォームにまとめられます。入力内容はメールアプリへ引き継ぐほか、ワンタッチでコピーできます。</p>
-      <div class="actions"><a class="btn btn-primary" href="tel:08052410066">電話で相談　080-5241-0066</a><button class="btn btn-ghost js-open-estimate" type="button">WEB見積もりを入力</button><button class="btn btn-line js-line" type="button">LINEで相談</button></div>
+      <p>WEBフォームから送信すると、内容がDPRO管理画面へ直接登録されます。希望日を選ぶと、DPROの受付可能な30分枠を読み込みます。</p>
+      <div class="actions"><a class="btn btn-primary" href="tel:08052410066">電話で相談　080-5241-0066</a><button class="btn btn-ghost js-open-estimate" type="button">DPRO WEB受付を開く</button><button class="btn btn-line js-line" type="button">LINEで相談</button></div><div class="dpro-site-note"><b>DPRO DEMO連動</b>　WEB受付内容を店舗管理画面へまとめて登録します。</div>
     </div>
   </section>
 </main>
@@ -522,7 +571,8 @@ button{font:inherit}
     <header class="modal-head">
       <p class="mini">WEB ESTIMATE REQUEST</p>
       <h2 id="estimateTitle">WEB見積もり・来店相談</h2>
-      <p>3つの画面に分けて、入力内容を確認してから送信できます。</p>
+      <p>3つの画面に分けて入力し、DPRO管理画面へ直接受付を登録します。</p>
+      <div class="api-status checking" id="apiStatus"><i></i><span id="apiStatusText">DPRO DEMO 接続確認中</span></div>
       <button class="modal-close" type="button" aria-label="閉じる" data-close-modal>×</button>
     </header>
 
@@ -590,6 +640,37 @@ button{font:inherit}
               <label for="carYear">年式</label>
               <input id="carYear" name="carYear" placeholder="例：2020年">
             </div>
+
+            <div class="field">
+              <label for="plateLast4">ナンバー下4桁</label>
+              <input id="plateLast4" name="plateLast4" inputmode="numeric" maxlength="4" placeholder="例：1234">
+            </div>
+
+            <div class="field">
+              <label for="mileageKm">走行距離</label>
+              <input id="mileageKm" name="mileageKm" inputmode="numeric" placeholder="例：65000">
+              <small>km単位。おおよそでも構いません。</small>
+            </div>
+
+            <div class="field">
+              <label for="shakenYear">車検満了年</label>
+              <select id="shakenYear" name="shakenYear">
+                <option value="">未入力</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="shakenMonth">車検満了月</label>
+              <select id="shakenMonth" name="shakenMonth">
+                <option value="">未入力</option>
+                <option value="1">1月</option><option value="2">2月</option>
+                <option value="3">3月</option><option value="4">4月</option>
+                <option value="5">5月</option><option value="6">6月</option>
+                <option value="7">7月</option><option value="8">8月</option>
+                <option value="9">9月</option><option value="10">10月</option>
+                <option value="11">11月</option><option value="12">12月</option>
+              </select>
+            </div>
           </div>
 
           <div class="form-error" data-step-error="1">お名前と電話番号を確認してください。</div>
@@ -621,6 +702,18 @@ button{font:inherit}
               <label for="visitDate">希望来店日</label>
               <input id="visitDate" name="visitDate" type="date">
               <small>確定予約ではありません。店舗からの確認後に確定します。</small>
+            </div>
+
+            <div class="field">
+              <label for="preferredVisitTime">希望入庫時間</label>
+              <select id="preferredVisitTime" name="preferredVisitTime" disabled>
+                <option value="">先に希望来店日を選択</option>
+              </select>
+              <div class="slot-status" id="slotStatus">DPROから30分枠を読み込みます。</div>
+            </div>
+
+            <div class="field-row-note">
+              希望日時は仮受付です。DPROへ登録後、店舗からの確認連絡をもって正式確定となります。
             </div>
 
             <div class="field full">
@@ -676,9 +769,18 @@ button{font:inherit}
             「メールアプリで送信」を押すと、端末のメールアプリに宛先・件名・本文を引き継ぎます。最終的な送信操作はメールアプリ内で行います。
           </p>
 
+          <div class="api-result" id="apiResult" role="status" aria-live="polite">
+            <h4 id="apiResultTitle">DPRO受付結果</h4>
+            <p id="apiResultText"></p>
+            <div class="api-reference" id="apiReference"></div>
+            <div class="api-fallback" id="apiFallback">
+              DPROへ送信できなかった場合でも、下の「内容をコピー」または「メールで送信」を利用できます。
+            </div>
+          </div>
+
           <div class="modal-result" id="modalResult">
-            <h4>送信内容を準備しました</h4>
-            <p>メールアプリが開かない場合は、下の内容をコピーしてご利用ください。</p>
+            <h4>送信内容</h4>
+            <p>DPRO送信・メール送信・コピーで使用する内容です。</p>
             <div class="result-preview" id="resultPreview"></div>
           </div>
         </section>
@@ -691,7 +793,8 @@ button{font:inherit}
         <button class="btn btn-secondary" id="backStep" type="button" hidden>戻る</button>
         <button class="btn btn-primary" id="nextStep" type="button">次へ</button>
         <button class="btn btn-copy" id="copyEstimate" type="button" hidden>内容をコピー</button>
-        <button class="btn btn-mail" id="sendEstimate" type="submit" hidden>メールアプリで送信</button>
+        <button class="btn btn-mail-alt" id="mailEstimate" type="button" hidden>メールで送信</button>
+        <button class="btn btn-dpro" id="sendEstimate" type="submit" hidden>DPROへ受付送信</button>
       </footer>
     </form>
   </section>
@@ -702,9 +805,11 @@ button{font:inherit}
 (() => {
   'use strict';
 
+  const WORKER_API_BASE = 'https://ksh-line-demo-api.dpromstk2000.workers.dev';
+  const SHOP_CODE = 'street_house_kitsuki';
   const CONTACT_EMAIL = 'dpromstk2000@gmail.com';
   const LINE_URL = '';
-  const DRAFT_KEY = 'wanganEstimateDraftV2';
+  const DRAFT_KEY = 'wanganEstimateDraftV3';
 
   const menu = document.querySelector('.menu');
   const nav = document.querySelector('.nav');
@@ -717,19 +822,32 @@ button{font:inherit}
   const backButton = document.getElementById('backStep');
   const nextButton = document.getElementById('nextStep');
   const copyButton = document.getElementById('copyEstimate');
+  const mailButton = document.getElementById('mailEstimate');
   const sendButton = document.getElementById('sendEstimate');
   const resultBox = document.getElementById('modalResult');
   const resultPreview = document.getElementById('resultPreview');
+  const apiStatus = document.getElementById('apiStatus');
+  const apiStatusText = document.getElementById('apiStatusText');
+  const apiResult = document.getElementById('apiResult');
+  const apiResultTitle = document.getElementById('apiResultTitle');
+  const apiResultText = document.getElementById('apiResultText');
+  const apiReference = document.getElementById('apiReference');
+  const apiFallback = document.getElementById('apiFallback');
+  const visitDate = document.getElementById('visitDate');
+  const preferredVisitTime = document.getElementById('preferredVisitTime');
+  const slotStatus = document.getElementById('slotStatus');
 
   let currentStep = 1;
   let lastFocusedElement = null;
   let modalTop = 0;
+  let apiConnected = false;
+  let isSubmitting = false;
 
   const showToast = (message) => {
     toast.textContent = message;
     toast.classList.add('show');
     window.clearTimeout(showToast.timer);
-    showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 2600);
+    showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 2800);
   };
 
   menu?.addEventListener('click', () => {
@@ -745,13 +863,133 @@ button{font:inherit}
     });
   });
 
+  const setApiStatus = (state, text) => {
+    apiStatus.classList.remove('checking', 'connected', 'failed');
+    apiStatus.classList.add(state);
+    apiStatusText.textContent = text;
+  };
+
+  const checkDproConnection = async () => {
+    setApiStatus('checking', 'DPRO DEMO 接続確認中');
+    try {
+      const response = await fetch(
+        `${WORKER_API_BASE}/api/public/shop-settings?shopCode=${encodeURIComponent(SHOP_CODE)}`,
+        { headers: { Accept: 'application/json' } }
+      );
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.message || '接続できませんでした。');
+      apiConnected = true;
+      const shopName = result.shop_name || result.shop_settings?.shop_name || 'ストリートハウス湾岸通り';
+      setApiStatus('connected', `DPRO DEMO 接続済み｜${shopName}`);
+    } catch (error) {
+      apiConnected = false;
+      setApiStatus('failed', 'DPRO接続を確認できません｜メール・コピーは利用可能');
+    }
+  };
+
   const setMinDate = () => {
-    const dateInput = document.getElementById('visitDate');
-    if (!dateInput) return;
+    if (!visitDate) return;
     const now = new Date();
     const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-    dateInput.min = local.toISOString().slice(0, 10);
+    visitDate.min = local.toISOString().slice(0, 10);
   };
+
+  const populateShakenYears = () => {
+    const select = document.getElementById('shakenYear');
+    if (!select || select.options.length > 1) return;
+    const year = new Date().getFullYear();
+    for (let y = year - 1; y <= year + 7; y += 1) {
+      const option = document.createElement('option');
+      option.value = String(y);
+      option.textContent = `${y}年`;
+      select.appendChild(option);
+    }
+  };
+
+  const normalizeTimeValue = (value) => {
+    const text = String(value || '').trim();
+    const match = text.match(/^(\d{1,2}):(\d{2})/);
+    if (!match) return text;
+    return `${String(Number(match[1])).padStart(2, '0')}:${match[2]}`;
+  };
+
+  const resetTimeOptions = (message = '先に希望来店日を選択') => {
+    preferredVisitTime.innerHTML = `<option value="">${message}</option>`;
+    preferredVisitTime.disabled = true;
+  };
+
+  const loadAvailableTimes = async (dateValue) => {
+    if (!dateValue) {
+      resetTimeOptions();
+      slotStatus.className = 'slot-status';
+      slotStatus.textContent = 'DPROから30分枠を読み込みます。';
+      return;
+    }
+
+    resetTimeOptions('時間候補を読み込み中...');
+    slotStatus.className = 'slot-status loading';
+    slotStatus.textContent = 'DPROの受付可能枠を確認しています。';
+
+    try {
+      const response = await fetch(
+        `${WORKER_API_BASE}/api/public/reservation-time-options?date=${encodeURIComponent(dateValue)}`,
+        { headers: { Accept: 'application/json' } }
+      );
+      const result = await response.json();
+
+      if (!response.ok || !result.ok || !result.available) {
+        throw new Error(result.reason || result.message || 'この日は受付できません。');
+      }
+
+      const slots = Array.isArray(result.slots) ? result.slots : [];
+      const times = Array.isArray(result.times) ? result.times : [];
+
+      const slotItems = slots.length
+        ? slots.map((slot) => ({
+            time: normalizeTimeValue(slot.time),
+            remaining: Number(
+              slot.remaining ??
+              Math.max(Number(slot.limit || result.slotLimit || 1) - Number(slot.used || 0), 0)
+            ),
+            isFull: Boolean(slot.isFull ?? slot.is_full)
+          })).filter((slot) => slot.time)
+        : times.map((time) => ({
+            time: normalizeTimeValue(time),
+            remaining: Number(result.slotLimit || 1),
+            isFull: false
+          })).filter((slot) => slot.time);
+
+      if (!slotItems.length) throw new Error('選択できる時間がありません。');
+
+      const options = slotItems.map((slot) => {
+        const disabled = slot.isFull || slot.remaining <= 0;
+        const option = document.createElement('option');
+        option.value = slot.time;
+        option.disabled = disabled;
+        option.textContent = disabled ? `${slot.time}（満枠）` : `${slot.time}（残り${slot.remaining}）`;
+        return option;
+      });
+
+      preferredVisitTime.innerHTML = '<option value="">希望入庫時間を選択</option>';
+      options.forEach((option) => preferredVisitTime.appendChild(option));
+
+      const hasOpenSlot = slotItems.some((slot) => !slot.isFull && slot.remaining > 0);
+      preferredVisitTime.disabled = !hasOpenSlot;
+      if (!hasOpenSlot) throw new Error('選択した日は満枠です。別の日を選択してください。');
+
+      slotStatus.className = 'slot-status ok';
+      slotStatus.textContent = 'DPROから現在の受付可能枠を読み込みました。';
+    } catch (error) {
+      resetTimeOptions(error.message || '時間枠を取得できませんでした。');
+      slotStatus.className = 'slot-status ng';
+      slotStatus.textContent = `${error.message || '時間枠を取得できませんでした。'} 電話での確認も可能です。`;
+    }
+  };
+
+  visitDate?.addEventListener('change', () => {
+    preferredVisitTime.value = '';
+    loadAvailableTimes(visitDate.value);
+  });
 
   const openModal = () => {
     lastFocusedElement = document.activeElement;
@@ -761,6 +999,7 @@ button{font:inherit}
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
     showStep(1, false);
+    checkDproConnection();
     window.setTimeout(() => document.getElementById('customerName')?.focus(), 60);
   };
 
@@ -774,7 +1013,6 @@ button{font:inherit}
 
   document.querySelectorAll('.js-open-estimate').forEach((button) => button.addEventListener('click', openModal));
   document.querySelectorAll('[data-close-modal]').forEach((button) => button.addEventListener('click', closeModal));
-
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && modal.classList.contains('open')) closeModal();
   });
@@ -794,26 +1032,27 @@ button{font:inherit}
     const panel = document.querySelector(`[data-step-panel="${step}"]`);
     const error = document.querySelector(`[data-step-error="${step}"]`);
     if (!panel) return true;
-
     let valid = true;
+
     panel.querySelectorAll('[required]').forEach((field) => {
       const okay = field.type === 'checkbox' ? field.checked : field.checkValidity();
       setFieldInvalid(field, !okay);
       if (!okay) valid = false;
     });
 
+    if (step === 2 && visitDate.value && !preferredVisitTime.value) {
+      setFieldInvalid(preferredVisitTime, true);
+      valid = false;
+    }
+
     if (!valid) {
       error?.classList.add('show');
-      const firstInvalid = panel.querySelector('[aria-invalid="true"]');
-      firstInvalid?.focus();
+      panel.querySelector('[aria-invalid="true"]')?.focus();
     } else {
       error?.classList.remove('show');
     }
     return valid;
   };
-
-  const pair = (label, value, className = '') =>
-    `<div><dt>${label}</dt><dd class="${className}">${escapeHtml(value || '未入力')}</dd></div>`;
 
   const escapeHtml = (value) => String(value)
     .replaceAll('&', '&amp;')
@@ -822,30 +1061,41 @@ button{font:inherit}
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
 
+  const pair = (label, value, className = '') =>
+    `<div><dt>${label}</dt><dd class="${className}">${escapeHtml(value || '未入力')}</dd></div>`;
+
+  const shakenText = (d) =>
+    d.shakenYear && d.shakenMonth ? `${d.shakenYear}年${d.shakenMonth}月` : '未入力';
+
   const updateConfirmation = () => {
     const d = getFormData();
 
     document.getElementById('confirmCustomer').innerHTML = [
-      pair('お名前', d.customerName),
-      pair('電話番号', d.phone),
-      pair('メール', d.email),
-      pair('希望連絡方法', d.contactMethod),
-      pair('連絡時間帯', d.preferredTime)
+      pair('お名前', d.customerName), pair('電話番号', d.phone), pair('メール', d.email),
+      pair('希望連絡方法', d.contactMethod), pair('連絡時間帯', d.preferredTime)
     ].join('');
 
     document.getElementById('confirmCar').innerHTML = [
-      pair('メーカー', d.carMaker),
-      pair('車種', d.carModel),
-      pair('年式', d.carYear),
-      pair('希望来店日', d.visitDate || '指定なし')
+      pair('メーカー', d.carMaker), pair('車種', d.carModel), pair('年式', d.carYear),
+      pair('ナンバー下4桁', d.plateLast4),
+      pair('走行距離', d.mileageKm ? `${d.mileageKm} km` : '未入力'),
+      pair('車検満了年月', shakenText(d)),
+      pair('希望入庫日時', d.visitDate ? `${d.visitDate} ${d.preferredVisitTime || ''}` : '指定なし')
     ].join('');
 
     document.getElementById('confirmRequest').innerHTML = [
-      pair('相談分類', d.kind),
-      pair('持込部品等', d.partsInfo || 'なし'),
-      pair('詳しい内容', d.message, 'confirm-message'),
-      pair('個人情報利用', d.privacyAgree)
+      pair('相談分類', d.kind), pair('持込部品等', d.partsInfo || 'なし'),
+      pair('詳しい内容', d.message, 'confirm-message'), pair('個人情報利用', d.privacyAgree)
     ].join('');
+  };
+
+  const resetApiResult = () => {
+    apiResult.className = 'api-result';
+    apiResultTitle.textContent = 'DPRO受付結果';
+    apiResultText.textContent = '';
+    apiReference.className = 'api-reference';
+    apiReference.textContent = '';
+    apiFallback.className = 'api-fallback';
   };
 
   const showStep = (step, focus = true) => {
@@ -864,13 +1114,20 @@ button{font:inherit}
     backButton.hidden = currentStep === 1;
     nextButton.hidden = currentStep === 3;
     copyButton.hidden = currentStep !== 3;
+    mailButton.hidden = currentStep !== 3;
     sendButton.hidden = currentStep !== 3;
     footerStepLabel.textContent = `${currentStep} / 3`;
 
-    if (currentStep === 3) updateConfirmation();
+    if (currentStep === 3) {
+      updateConfirmation();
+      resultPreview.textContent = buildMessage();
+      resultBox.classList.add('show');
+    } else {
+      resultBox.classList.remove('show');
+      resetApiResult();
+    }
 
     modalScroll.scrollTop = 0;
-    resultBox.classList.remove('show');
 
     if (focus) {
       const panel = document.querySelector(`[data-step-panel="${currentStep}"]`);
@@ -882,34 +1139,61 @@ button{font:inherit}
     if (!validateStep(currentStep)) return;
     showStep(currentStep + 1);
   });
-
   backButton?.addEventListener('click', () => showStep(currentStep - 1));
 
   const buildMessage = () => {
     const d = getFormData();
     return [
-      'ストリートハウス湾岸通り WEB見積もり・来店相談',
-      '',
+      'ストリートハウス湾岸通り WEB見積もり・来店相談','',
       `■ ご相談内容：${d.kind || '未入力'}`,
       `■ 希望連絡方法：${d.contactMethod || '指定なし'}`,
       `■ お名前：${d.customerName || '未入力'}`,
       `■ 電話番号：${d.phone || '未入力'}`,
       `■ メール：${d.email || '未入力'}`,
-      `■ 連絡しやすい時間：${d.preferredTime || '指定なし'}`,
-      '',
+      `■ 連絡しやすい時間：${d.preferredTime || '指定なし'}`,'',
       `■ メーカー：${d.carMaker || '未入力'}`,
       `■ 車種：${d.carModel || '未入力'}`,
       `■ 年式：${d.carYear || '未入力'}`,
-      `■ 希望来店日：${d.visitDate || '指定なし'}`,
-      `■ 持込部品・商品URL・型番：${d.partsInfo || 'なし'}`,
-      '',
-      '■ 症状・ご希望・ご相談内容',
-      d.message || '未入力',
-      '',
+      `■ ナンバー下4桁：${d.plateLast4 || '未入力'}`,
+      `■ 走行距離：${d.mileageKm ? `${d.mileageKm} km` : '未入力'}`,
+      `■ 車検満了年月：${shakenText(d)}`,
+      `■ 希望入庫日時：${d.visitDate ? `${d.visitDate} ${d.preferredVisitTime || ''}` : '指定なし'}`,
+      `■ 持込部品・商品URL・型番：${d.partsInfo || 'なし'}`,'',
+      '■ 症状・ご希望・ご相談内容', d.message || '未入力','',
       `送信日時：${new Date().toLocaleString('ja-JP')}`,
       `送信元ページ：${location.href}`
-    ].join('
-');
+    ].join('\n');
+  };
+
+  const buildDproPayload = () => {
+    const d = getFormData();
+    const carName = [d.carMaker, d.carModel].filter(Boolean).join(' ').trim();
+    const vehicleLabel = [d.carMaker, d.carModel, d.carYear].filter(Boolean).join(' / ');
+    const additionalInfo = [
+      d.email ? `メールアドレス：${d.email}` : '',
+      d.partsInfo ? `持込部品・商品URL・型番：${d.partsInfo}` : '',
+      d.message || ''
+    ].filter(Boolean).join('\n');
+
+    return {
+      shopCode: SHOP_CODE, customerId: '', vehicleId: '',
+      name: String(d.customerName || '').trim(),
+      phone: String(d.phone || '').trim(),
+      email: String(d.email || '').trim(),
+      lineUserId: '', lineDisplayName: '',
+      carName, plateLast4: String(d.plateLast4 || '').trim(), vehicleLabel,
+      consultType: d.kind || '',
+      otherConsultDetail: d.partsInfo || '',
+      preferredVisitDate: d.visitDate || '',
+      preferredVisitTime: d.preferredVisitTime || '',
+      preferredContactMethod: d.contactMethod || '',
+      shakenYear: d.shakenYear || '', shakenMonth: d.shakenMonth || '',
+      mileageKm: String(d.mileageKm || '').trim(),
+      message: additionalInfo,
+      customerMode: 'new', vehicleMode: 'new', source: 'WEB',
+      pageUrl: window.location.href,
+      clientRequestId: crypto.randomUUID ? crypto.randomUUID() : `web-${Date.now()}`
+    };
   };
 
   const saveDraft = () => {
@@ -927,17 +1211,13 @@ button{font:inherit}
       const raw = localStorage.getItem(DRAFT_KEY);
       if (!raw) return;
       const data = JSON.parse(raw);
-
       Object.entries(data).forEach(([name, value]) => {
         const field = form.elements.namedItem(name);
         if (!field) return;
-        if (field.type === 'checkbox') {
-          field.checked = Boolean(value);
-        } else if (typeof value === 'string') {
-          field.value = value;
-        }
+        if (field.type === 'checkbox') field.checked = Boolean(value);
+        else if (typeof value === 'string') field.value = value;
       });
-
+      if (visitDate.value) loadAvailableTimes(visitDate.value);
       draftStatus.textContent = '前回の入力内容を復元しました';
     } catch (_) {}
   };
@@ -949,15 +1229,44 @@ button{font:inherit}
     window.clearTimeout(saveTimer);
     saveTimer = window.setTimeout(saveDraft, 400);
   });
-
   form?.addEventListener('change', (event) => {
     setFieldInvalid(event.target, false);
     window.clearTimeout(saveTimer);
     saveTimer = window.setTimeout(saveDraft, 250);
   });
 
-  form?.addEventListener('submit', (event) => {
+  const showApiFailure = (message) => {
+    apiResult.className = 'api-result show failure';
+    apiResultTitle.textContent = 'DPROへ送信できませんでした';
+    apiResultText.textContent = message || '通信状態またはDPRO設定を確認してください。';
+    apiFallback.className = 'api-fallback show';
+    apiReference.className = 'api-reference';
+  };
+
+  const showApiSuccess = (result) => {
+    const reference = result.inquiryId || result.inquiry_id || result.id ||
+      result.inquiry?.id || result.data?.id || result.requestId || '';
+
+    apiResult.className = 'api-result show success';
+    apiResultTitle.textContent = 'DPROへのWEB受付が完了しました';
+    apiResultText.textContent = result.message ||
+      '店舗管理画面へ相談内容を登録しました。希望日時は仮受付のため、店舗からの連絡をお待ちください。';
+
+    if (reference) {
+      apiReference.textContent = `受付参照：${reference}`;
+      apiReference.className = 'api-reference show';
+    } else {
+      apiReference.className = 'api-reference';
+    }
+
+    apiFallback.className = 'api-fallback';
+    localStorage.removeItem(DRAFT_KEY);
+    draftStatus.textContent = 'DPROへ受付済み';
+  };
+
+  form?.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (isSubmitting) return;
 
     const step1Okay = validateStep(1);
     const step2Okay = validateStep(2);
@@ -966,22 +1275,50 @@ button{font:inherit}
       return;
     }
 
-    const message = buildMessage();
-    resultPreview.textContent = message;
-    resultBox.classList.add('show');
+    isSubmitting = true;
+    sendButton.disabled = true;
+    const originalText = sendButton.textContent;
+    sendButton.textContent = 'DPROへ送信中...';
+    resetApiResult();
 
-    const d = getFormData();
-    const subject = `【WEB相談】${d.kind || '車の相談'}／${d.customerName || 'お客様'}`;
-    const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
-    window.location.href = mailto;
-    showToast('メールアプリへ送信内容を引き継ぎました。');
+    try {
+      const response = await fetch(`${WORKER_API_BASE}/api/inquiries`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', Accept: 'application/json'},
+        body: JSON.stringify(buildDproPayload())
+      });
+
+      const raw = await response.text();
+      let result = {};
+      try { result = raw ? JSON.parse(raw) : {}; }
+      catch (_) { result = {ok:false, message:raw || 'DPROから正しい応答を受け取れませんでした。'}; }
+
+      if (!response.ok || !result.ok) {
+        throw new Error(result.message || `送信に失敗しました（HTTP ${response.status}）`);
+      }
+
+      apiConnected = true;
+      setApiStatus('connected', 'DPRO DEMO 接続済み｜受付登録完了');
+      showApiSuccess(result);
+      showToast('DPRO管理画面へ受付を登録しました。');
+      modalScroll.scrollTop = modalScroll.scrollHeight;
+    } catch (error) {
+      apiConnected = false;
+      setApiStatus('failed', 'DPRO送信失敗｜メール・コピーで送信可能');
+      showApiFailure(error.message || 'DPROへの送信に失敗しました。');
+      showToast('DPROへ送信できませんでした。メールまたはコピーをご利用ください。');
+      modalScroll.scrollTop = modalScroll.scrollHeight;
+    } finally {
+      isSubmitting = false;
+      sendButton.disabled = false;
+      sendButton.textContent = originalText;
+    }
   });
 
   copyButton?.addEventListener('click', async () => {
     const message = buildMessage();
     resultPreview.textContent = message;
     resultBox.classList.add('show');
-
     try {
       await navigator.clipboard.writeText(message);
       showToast('入力内容をコピーしました。');
@@ -996,6 +1333,13 @@ button{font:inherit}
     }
   });
 
+  mailButton?.addEventListener('click', () => {
+    const d = getFormData();
+    const subject = `【WEB相談】${d.kind || '車の相談'}／${d.customerName || 'お客様'}`;
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(buildMessage())}`;
+    showToast('メールアプリへ送信内容を引き継ぎました。');
+  });
+
   document.getElementById('clearDraft')?.addEventListener('click', () => {
     if (!window.confirm('入力内容をすべて消去しますか？')) return;
     form.reset();
@@ -1003,24 +1347,28 @@ button{font:inherit}
     draftStatus.textContent = '入力内容をクリアしました';
     document.querySelectorAll('[aria-invalid="true"]').forEach((field) => setFieldInvalid(field, false));
     document.querySelectorAll('.form-error').forEach((error) => error.classList.remove('show'));
+    resetTimeOptions();
+    slotStatus.className = 'slot-status';
+    slotStatus.textContent = 'DPROから30分枠を読み込みます。';
     showStep(1, false);
     setMinDate();
   });
 
   document.querySelectorAll('.js-line').forEach((button) => {
     button.addEventListener('click', () => {
-      if (LINE_URL) {
-        window.open(LINE_URL, '_blank', 'noopener');
-      } else {
-        showToast('LINE公式URL確認後に接続します。現在はWEB見積もりをご利用ください。');
+      if (LINE_URL) window.open(LINE_URL, '_blank', 'noopener');
+      else {
+        showToast('LINE公式URL確認後に接続します。現在はDPRO WEB受付をご利用ください。');
         openModal();
       }
     });
   });
 
+  populateShakenYears();
   setMinDate();
   loadDraft();
   showStep(1, false);
+  checkDproConnection();
 })();
 </script>
 </body>
