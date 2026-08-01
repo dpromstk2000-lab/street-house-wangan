@@ -860,6 +860,325 @@ details:not([open]) .faq-answer,
   }
 }
 
+
+/* STEP WANGAN-WEB-13: cinematic hero sequence */
+.cinematic-hero{
+  background-color:#050709;
+  isolation:isolate;
+}
+.cinematic-stage{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  overflow:hidden;
+  opacity:0;
+  background:#050709;
+  transition:opacity 1s ease;
+  pointer-events:none;
+}
+.cinematic-hero.cinematic-ready .cinematic-stage{opacity:1}
+.cinematic-slide{
+  position:absolute;
+  inset:-4%;
+  z-index:0;
+  opacity:0;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-size:cover;
+  transform:scale(1.08) translate3d(0,0,0);
+  filter:saturate(.93) contrast(1.06) brightness(.88);
+  transition:opacity 1.55s cubic-bezier(.22,.61,.36,1);
+  will-change:opacity,transform;
+}
+.cinematic-slide.is-active{
+  z-index:2;
+  opacity:1;
+  animation:cinematicCameraA 6.8s linear both;
+}
+.cinematic-slide:nth-child(even).is-active{
+  animation-name:cinematicCameraB;
+}
+.cinematic-slide.was-active{
+  z-index:1;
+  opacity:0;
+}
+.cinematic-vignette{
+  position:absolute;
+  inset:0;
+  z-index:4;
+  background:
+    linear-gradient(90deg,rgba(4,6,8,.96) 0%,rgba(4,6,8,.84) 38%,rgba(4,6,8,.25) 72%,rgba(4,6,8,.48) 100%),
+    linear-gradient(0deg,rgba(4,6,8,.94) 0%,transparent 42%,rgba(4,6,8,.18) 100%),
+    radial-gradient(circle at 70% 45%,transparent 0 25%,rgba(3,5,7,.32) 72%,rgba(3,5,7,.65) 100%);
+}
+.cinematic-grain{
+  position:absolute;
+  inset:-50%;
+  z-index:5;
+  opacity:.075;
+  background-image:
+    radial-gradient(circle at 20% 30%,#fff 0 1px,transparent 1.3px),
+    radial-gradient(circle at 65% 72%,#fff 0 .8px,transparent 1.2px),
+    radial-gradient(circle at 40% 80%,#fff 0 .7px,transparent 1.1px);
+  background-size:7px 7px,9px 9px,11px 11px;
+  animation:cinematicGrain .28s steps(2) infinite;
+  mix-blend-mode:soft-light;
+}
+.cinematic-letterbox{
+  position:absolute;
+  left:0;
+  right:0;
+  z-index:6;
+  height:clamp(7px,1.1vw,17px);
+  background:#050709;
+  opacity:.86;
+}
+.cinematic-letterbox-top{top:0}
+.cinematic-letterbox-bottom{bottom:0}
+
+.cinematic-hero::before{
+  z-index:7;
+  pointer-events:none;
+}
+.cinematic-hero::after{
+  z-index:8;
+}
+.cinematic-hero .hero-content{
+  position:relative;
+  z-index:10;
+}
+
+.cinematic-hud{
+  position:absolute;
+  right:max(5vw,30px);
+  bottom:74px;
+  z-index:12;
+  width:min(420px,42vw);
+  display:grid;
+  gap:15px;
+  color:#fff;
+  text-align:right;
+}
+.cinematic-now{
+  display:grid;
+  justify-items:end;
+  gap:3px;
+  text-shadow:0 3px 18px rgba(0,0,0,.8);
+}
+.cinematic-live{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:var(--yellow2);
+  font-size:9px;
+  font-weight:1000;
+  letter-spacing:.22em;
+}
+.cinematic-live i{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--yellow);
+  box-shadow:0 0 0 5px rgba(242,197,21,.13);
+  animation:cinematicPulse 1.5s ease-in-out infinite;
+}
+.cinematic-now strong{
+  font-size:clamp(16px,1.65vw,25px);
+  line-height:1.25;
+  letter-spacing:.03em;
+  transition:opacity .35s ease,transform .35s ease;
+}
+.cinematic-now small{
+  color:rgba(255,255,255,.62);
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.16em;
+  transition:opacity .35s ease,transform .35s ease;
+}
+.cinematic-now.is-changing strong,
+.cinematic-now.is-changing small{
+  opacity:0;
+  transform:translateY(7px);
+}
+.cinematic-controller{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:13px;
+}
+.cinematic-progress{
+  width:min(310px,31vw);
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+}
+.cinematic-progress button{
+  position:relative;
+  height:20px;
+  padding:0;
+  border:0;
+  background:transparent;
+  cursor:pointer;
+}
+.cinematic-progress button::before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:9px;
+  height:2px;
+  background:rgba(255,255,255,.25);
+}
+.cinematic-progress button span{
+  position:absolute;
+  left:0;
+  top:9px;
+  width:0;
+  height:2px;
+  background:var(--yellow);
+  box-shadow:0 0 10px rgba(242,197,21,.45);
+}
+.cinematic-progress button.is-complete span{width:100%}
+.cinematic-progress button.is-active span{
+  animation:cinematicProgress 6.8s linear forwards;
+}
+.cinematic-hero.cinematic-paused .cinematic-progress button.is-active span,
+.cinematic-hero.cinematic-paused .cinematic-slide.is-active,
+.cinematic-hero.cinematic-paused .cinematic-grain{
+  animation-play-state:paused;
+}
+.cinematic-toggle{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-width:74px;
+  height:33px;
+  padding:0 10px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(6,9,11,.54);
+  color:#fff;
+  font:inherit;
+  cursor:pointer;
+  backdrop-filter:blur(8px);
+  transition:border-color .3s ease,background .3s ease,transform .3s ease;
+}
+.cinematic-toggle:hover{
+  border-color:var(--yellow);
+  background:rgba(6,9,11,.8);
+  transform:translateY(-2px);
+}
+.cinematic-pause-icon{
+  font-size:10px;
+  font-weight:1000;
+  letter-spacing:-2px;
+}
+.cinematic-toggle-text{
+  font-size:8px;
+  font-weight:1000;
+  letter-spacing:.12em;
+}
+.cinematic-scroll{
+  position:absolute;
+  left:50%;
+  bottom:25px;
+  z-index:12;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  transform:translateX(-50%);
+  color:rgba(255,255,255,.53);
+  font-size:8px;
+  font-weight:1000;
+  letter-spacing:.2em;
+  pointer-events:none;
+}
+.cinematic-scroll i{
+  position:relative;
+  width:42px;
+  height:1px;
+  overflow:hidden;
+  background:rgba(255,255,255,.22);
+}
+.cinematic-scroll i::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:var(--yellow);
+  transform:translateX(-100%);
+  animation:cinematicScrollLine 2.1s ease-in-out infinite;
+}
+.cinematic-hero.cinematic-reduced .cinematic-hud,
+.cinematic-hero.cinematic-reduced .cinematic-scroll{
+  display:none;
+}
+
+@keyframes cinematicCameraA{
+  0%{transform:scale(1.08) translate3d(0,0,0)}
+  100%{transform:scale(1.18) translate3d(-1.8%,.8%,0)}
+}
+@keyframes cinematicCameraB{
+  0%{transform:scale(1.13) translate3d(-1.5%,-.4%,0)}
+  100%{transform:scale(1.07) translate3d(1.2%,.7%,0)}
+}
+@keyframes cinematicProgress{
+  from{width:0}
+  to{width:100%}
+}
+@keyframes cinematicPulse{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.45;transform:scale(.78)}
+}
+@keyframes cinematicScrollLine{
+  0%{transform:translateX(-100%)}
+  55%,100%{transform:translateX(100%)}
+}
+@keyframes cinematicGrain{
+  0%{transform:translate3d(0,0,0)}
+  25%{transform:translate3d(2%,-1%,0)}
+  50%{transform:translate3d(-1%,2%,0)}
+  75%{transform:translate3d(1%,1%,0)}
+  100%{transform:translate3d(-2%,-1%,0)}
+}
+
+@media(max-width:900px){
+  .cinematic-hud{
+    right:22px;
+    bottom:57px;
+    width:min(360px,52vw);
+  }
+}
+@media(max-width:760px){
+  .cinematic-hud{
+    left:17px;
+    right:17px;
+    bottom:58px;
+    width:auto;
+    text-align:left;
+  }
+  .cinematic-now{justify-items:start}
+  .cinematic-controller{justify-content:flex-start}
+  .cinematic-progress{width:calc(100% - 88px)}
+  .cinematic-now strong{font-size:16px}
+  .cinematic-scroll{display:none}
+  .cinematic-vignette{
+    background:
+      linear-gradient(90deg,rgba(4,6,8,.94) 0%,rgba(4,6,8,.76) 58%,rgba(4,6,8,.42) 100%),
+      linear-gradient(0deg,rgba(4,6,8,.96) 0%,transparent 48%,rgba(4,6,8,.25) 100%);
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .cinematic-slide,
+  .cinematic-slide.is-active,
+  .cinematic-grain,
+  .cinematic-live i,
+  .cinematic-progress button.is-active span,
+  .cinematic-scroll i::after{
+    animation:none!important;
+  }
+  .cinematic-slide.is-active{transform:scale(1.04)}
+}
+
 </style>
 </head>
 <body>
@@ -881,7 +1200,43 @@ details:not([open]) .faq-answer,
 </div>
 </header>
 <main id="main">
-<section class="hero motion-reveal" id="top">
+<section class="hero cinematic-hero motion-reveal" id="top">
+<div class="cinematic-stage" id="cinematicStage" aria-hidden="true">
+  <div class="cinematic-slide is-active" data-cinematic-slide></div>
+  <div class="cinematic-slide" data-cinematic-slide></div>
+  <div class="cinematic-slide" data-cinematic-slide></div>
+  <div class="cinematic-slide" data-cinematic-slide></div>
+  <div class="cinematic-vignette"></div>
+  <div class="cinematic-grain"></div>
+  <div class="cinematic-letterbox cinematic-letterbox-top"></div>
+  <div class="cinematic-letterbox cinematic-letterbox-bottom"></div>
+</div>
+
+<div class="cinematic-hud" id="cinematicHud">
+  <div class="cinematic-now">
+    <span class="cinematic-live"><i></i>CINEMATIC GARAGE FILM</span>
+    <strong id="cinematicLabel">街に根ざす整備工場</strong>
+    <small id="cinematicSubLabel">STREET HOUSE / KITSUKI</small>
+  </div>
+
+  <div class="cinematic-controller">
+    <div class="cinematic-progress" id="cinematicProgress" aria-label="シーンを選択">
+      <button class="is-active" type="button" data-cinematic-index="0" aria-label="店舗外観のシーン"><span></span></button>
+      <button type="button" data-cinematic-index="1" aria-label="整備作業のシーン"><span></span></button>
+      <button type="button" data-cinematic-index="2" aria-label="パーツ・カスタムのシーン"><span></span></button>
+      <button type="button" data-cinematic-index="3" aria-label="スポーツ・チューニングのシーン"><span></span></button>
+    </div>
+    <button class="cinematic-toggle" id="cinematicToggle" type="button" aria-label="シネマティック表示を一時停止" aria-pressed="false">
+      <span class="cinematic-pause-icon" aria-hidden="true">Ⅱ</span>
+      <span class="cinematic-toggle-text">PAUSE</span>
+    </button>
+  </div>
+</div>
+
+<div class="cinematic-scroll" aria-hidden="true">
+  <span>SCROLL</span><i></i>
+</div>
+
 <div class="shell hero-content">
 <p class="kicker">OITA KITSUKI / CAR SERVICE &amp; CUSTOM</p>
 <h1><span>走りも、日常も。</span>愛車を任せられる整備工場。</h1>
@@ -1029,7 +1384,7 @@ details:not([open]) .faq-answer,
 <div class="actions"><a class="btn btn-primary" href="tel:08052410066">電話で相談　080-5241-0066</a><button class="btn btn-ghost js-open-estimate" type="button">DPRO WEB受付を開く</button><button class="btn btn-line js-line" type="button">LINEで相談</button></div><div class="dpro-site-note" id="environmentNote">
 <b id="environmentLabel">DPRO DEMO連動</b>
 <span id="environmentText">WEB受付内容を店舗管理画面へまとめて登録します。</span>
-<span class="version-badge">WEB-12 MOTION</span>
+<span class="version-badge">WEB-13 CINEMATIC</span>
 </div>
 </div>
 </section>
@@ -1287,11 +1642,11 @@ details:not([open]) .faq-answer,
 </div>
 <section aria-hidden="true" class="system-check motion-reveal" id="systemCheck">
 <div class="check-shell">
-<header class="check-head"><div><p>INTERNAL SYSTEM CHECK</p><h1>WANGAN WEB-12 モーション強化・最終チェック</h1><small>通常のお客様画面には表示されません。URLへ <code>?system-check=1</code> を付けた場合のみ開きます。</small></div><button class="check-close" id="closeSystemCheck" type="button">サイトへ戻る</button></header>
+<header class="check-head"><div><p>INTERNAL SYSTEM CHECK</p><h1>WANGAN WEB-13 シネマティック・最終チェック</h1><small>通常のお客様画面には表示されません。URLへ <code>?system-check=1</code> を付けた場合のみ開きます。</small></div><button class="check-close" id="closeSystemCheck" type="button">サイトへ戻る</button></header>
 <div class="check-summary"><div><b id="checkTotal">0</b><span>検査件数</span></div><div><b id="checkPass">0</b><span>合格</span></div><div><b id="checkWarn">0</b><span>注意</span></div><div><b id="checkFail">0</b><span>失敗</span></div></div>
 <section class="final-delivery-card motion-reveal from-left">
 <span class="final-kicker">FINAL DELIVERY VERSION</span>
-<h2>WANGAN WEB-12 モーション強化版</h2>
+<h2>WANGAN WEB-13 シネマティック版</h2>
 <p>デザイン、DPRO WEB受付、30分枠取得、二重送信防止、プライバシー、SEO、内部検査まで統合済みです。</p>
 <div class="final-delivery-meta">
 <span>GitHub Pages対応</span>
@@ -1442,6 +1797,186 @@ details:not([open]) .faq-answer,
   const releaseVerdictTitle = document.getElementById('releaseVerdictTitle');
   const releaseVerdictText = document.getElementById('releaseVerdictText');
   const lineSetupInput = document.getElementById('lineSetupInput');
+
+
+  const initializeCinematicHero = () => {
+    const hero = document.querySelector('.cinematic-hero');
+    const stage = document.getElementById('cinematicStage');
+    const slides = Array.from(document.querySelectorAll('[data-cinematic-slide]'));
+    const progressButtons = Array.from(document.querySelectorAll('[data-cinematic-index]'));
+    const label = document.getElementById('cinematicLabel');
+    const subLabel = document.getElementById('cinematicSubLabel');
+    const nowPanel = document.querySelector('.cinematic-now');
+    const toggle = document.getElementById('cinematicToggle');
+    const toggleIcon = toggle?.querySelector('.cinematic-pause-icon');
+    const toggleText = toggle?.querySelector('.cinematic-toggle-text');
+
+    if (!hero || !stage || slides.length < 4) return false;
+
+    const sceneData = [
+      { label: '街に根ざす整備工場', sub: 'STREET HOUSE / KITSUKI' },
+      { label: '確かな整備・故障診断', sub: 'MAINTENANCE / DIAGNOSIS' },
+      { label: '持込パーツ・カスタム', sub: 'PARTS / CUSTOM' },
+      { label: '走りを支えるチューニング', sub: 'MOTORSPORT / PERFORMANCE' }
+    ];
+
+    const extractUrls = (backgroundValue) => {
+      const value = String(backgroundValue || '');
+      const matches = [...value.matchAll(/url\((['"]?)(.*?)\1\)/g)];
+      return matches.map((match) => match[2]).filter(Boolean);
+    };
+
+    const sourceElements = [
+      hero,
+      ...document.querySelectorAll('.feature-media'),
+      ...document.querySelectorAll('.service-bg')
+    ];
+
+    const uniqueUrls = [];
+    sourceElements.forEach((element) => {
+      const backgrounds = [
+        element.style?.backgroundImage,
+        getComputedStyle(element).backgroundImage
+      ];
+
+      backgrounds.forEach((background) => {
+        extractUrls(background).forEach((url) => {
+          if (url && !uniqueUrls.includes(url)) uniqueUrls.push(url);
+        });
+      });
+    });
+
+    if (!uniqueUrls.length) return false;
+
+    const chosen = [
+      uniqueUrls[0],
+      uniqueUrls[1] || uniqueUrls[0],
+      uniqueUrls[3] || uniqueUrls[2] || uniqueUrls[0],
+      uniqueUrls[6] || uniqueUrls[4] || uniqueUrls[1] || uniqueUrls[0]
+    ];
+
+    slides.forEach((slide, index) => {
+      const imageUrl = chosen[index] || chosen[0];
+      slide.style.backgroundImage = `url(${JSON.stringify(imageUrl)})`;
+    });
+
+    hero.classList.add('cinematic-ready');
+
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (mediaQuery.matches) {
+      hero.classList.add('cinematic-reduced');
+      slides.forEach((slide, index) => slide.classList.toggle('is-active', index === 0));
+      return true;
+    }
+
+    const DURATION = 6800;
+    let currentIndex = 0;
+    let timerId = 0;
+    let userPaused = false;
+    let visibilityPaused = false;
+
+    const updateSceneText = (index) => {
+      nowPanel?.classList.add('is-changing');
+      window.setTimeout(() => {
+        if (label) label.textContent = sceneData[index].label;
+        if (subLabel) subLabel.textContent = sceneData[index].sub;
+        nowPanel?.classList.remove('is-changing');
+      }, 220);
+    };
+
+    const updateProgress = (index) => {
+      progressButtons.forEach((button, buttonIndex) => {
+        button.classList.remove('is-active', 'is-complete');
+        if (buttonIndex < index) button.classList.add('is-complete');
+      });
+
+      const activeButton = progressButtons[index];
+      if (activeButton) {
+        void activeButton.offsetWidth;
+        activeButton.classList.add('is-active');
+      }
+    };
+
+    const scheduleNext = () => {
+      window.clearTimeout(timerId);
+      if (userPaused || visibilityPaused) return;
+      timerId = window.setTimeout(() => {
+        activateScene((currentIndex + 1) % slides.length);
+      }, DURATION);
+    };
+
+    const activateScene = (nextIndex) => {
+      const normalized = ((nextIndex % slides.length) + slides.length) % slides.length;
+      if (normalized === currentIndex && slides[normalized].classList.contains('is-active')) {
+        updateProgress(normalized);
+        scheduleNext();
+        return;
+      }
+
+      slides.forEach((slide, index) => {
+        const wasActive = slide.classList.contains('is-active');
+        slide.classList.remove('is-active', 'was-active');
+        if (wasActive && index !== normalized) slide.classList.add('was-active');
+      });
+
+      currentIndex = normalized;
+      const activeSlide = slides[currentIndex];
+      void activeSlide.offsetWidth;
+      activeSlide.classList.add('is-active');
+
+      updateSceneText(currentIndex);
+      updateProgress(currentIndex);
+      scheduleNext();
+    };
+
+    const setPaused = (paused) => {
+      userPaused = paused;
+      hero.classList.toggle('cinematic-paused', paused);
+
+      if (toggle) {
+        toggle.setAttribute('aria-pressed', String(paused));
+        toggle.setAttribute(
+          'aria-label',
+          paused ? 'シネマティック表示を再生' : 'シネマティック表示を一時停止'
+        );
+      }
+      if (toggleIcon) toggleIcon.textContent = paused ? '▶' : 'Ⅱ';
+      if (toggleText) toggleText.textContent = paused ? 'PLAY' : 'PAUSE';
+
+      if (paused) window.clearTimeout(timerId);
+      else scheduleNext();
+    };
+
+    progressButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        activateScene(Number(button.dataset.cinematicIndex || 0));
+      });
+    });
+
+    toggle?.addEventListener('click', () => setPaused(!userPaused));
+
+    document.addEventListener('visibilitychange', () => {
+      visibilityPaused = document.hidden;
+      if (visibilityPaused) {
+        window.clearTimeout(timerId);
+        hero.classList.add('cinematic-paused');
+      } else {
+        hero.classList.toggle('cinematic-paused', userPaused);
+        scheduleNext();
+      }
+    });
+
+    mediaQuery.addEventListener?.('change', (event) => {
+      if (!event.matches) return;
+      window.clearTimeout(timerId);
+      hero.classList.add('cinematic-reduced');
+      slides.forEach((slide, index) => slide.classList.toggle('is-active', index === 0));
+    });
+
+    updateProgress(0);
+    scheduleNext();
+    return true;
+  };
 
   const initializeRevealMotion = () => {
     document.body.classList.add('motion-ready');
@@ -1704,12 +2239,17 @@ details:not([open]) .faq-answer,
     results.push(checkItem('受付控え保存',typeof downloadReceipt==='function'?'pass':'fail','テキスト形式で保存'));
     results.push(checkItem('WEB受付識別',APP_CONFIG.source==='WEB'&&Boolean(APP_CONFIG.sourceDetail)?'pass':'fail',`${APP_CONFIG.source} / ${APP_CONFIG.sourceDetail}`));
     results.push(checkItem('検査画面撮影対策',document.body.classList.contains('system-check-mode')?'pass':'warn','全ページ撮影時の固定画面重複を防止'));
-    results.push(checkItem('最終納品バージョン',document.querySelector('.version-badge')?.textContent.includes('WEB-10')?'pass':'fail',document.querySelector('.version-badge')?.textContent||'未確認'));
+    results.push(checkItem('最終納品バージョン',document.querySelector('.version-badge')?.textContent.includes('WEB-13')?'pass':'fail',document.querySelector('.version-badge')?.textContent||'未確認'));
     results.push(checkItem('正式公開設定生成',typeof buildProductionConfig==='function'&&typeof validateProductionConfig==='function'?'pass':'fail','APP_CONFIG一括生成'));
     results.push(checkItem('モーションCSS',document.documentElement.innerHTML.includes('STEP WANGAN-WEB-12: premium motion enhancement')?'pass':'fail','動き用スタイル'));
     results.push(checkItem('スクロール表示',typeof initializeRevealMotion==='function'?'pass':'fail','IntersectionObserver'));
     results.push(checkItem('ヒーロー演出',document.documentElement.innerHTML.includes('@keyframes heroSweep')?'pass':'fail','光演出・ズーム'));
     results.push(checkItem('CTA演出',document.documentElement.innerHTML.includes('box-shadow:0 14px 32px rgba(0,0,0,.28)')?'pass':'fail','ボタンのホバー演出'));
+    results.push(checkItem('シネマティック構成',document.querySelectorAll('[data-cinematic-slide]').length===4?'pass':'fail',`${document.querySelectorAll('[data-cinematic-slide]').length}シーン`));
+    results.push(checkItem('シーン自動切替',typeof initializeCinematicHero==='function'?'pass':'fail','6.8秒クロスフェード'));
+    results.push(checkItem('動画風カメラ移動',document.documentElement.innerHTML.includes('@keyframes cinematicCameraA')?'pass':'fail','Ken Burns演出'));
+    results.push(checkItem('再生・一時停止',Boolean(document.getElementById('cinematicToggle'))?'pass':'fail','操作ボタン'));
+    results.push(checkItem('軽量動画方式',document.querySelector('video')?'warn':'pass','既存画像を再利用・動画ファイル不要'));
     results.push(checkItem('DPRO Worker HTTPS',/^https:\/\//.test(WORKER_API_BASE)?'pass':'fail',WORKER_API_BASE));
     results.push(checkItem('店舗コード',SHOP_CODE?'pass':'fail',SHOP_CODE||'未設定'));
     results.push(checkItem('画像alt',[...document.images].every((img)=>img.hasAttribute('alt'))?'pass':'warn',`${[...document.images].filter((img)=>!img.hasAttribute('alt')).length}件不足`));
@@ -1757,7 +2297,7 @@ details:not([open]) .faq-answer,
   };
   document.getElementById('runSystemCheck')?.addEventListener('click',runSystemChecks);
   document.getElementById('closeSystemCheck')?.addEventListener('click',()=>{location.href=APP_CONFIG.siteUrl;});
-  document.getElementById('copySystemCheck')?.addEventListener('click',async()=>{const rows=[...checkResults.querySelectorAll('tr')].map((row)=>[...row.children].map((cell)=>cell.textContent.trim()).join(' | ')); const summary=[`WANGAN WEB-12 モーション強化・最終チェック`,`検査件数: ${document.getElementById('checkTotal').textContent}`,`合格: ${document.getElementById('checkPass').textContent}`,`注意: ${document.getElementById('checkWarn').textContent}`,`失敗: ${document.getElementById('checkFail').textContent}`,'',...rows].join('\n'); try{await navigator.clipboard.writeText(summary);showToast('検査結果をコピーしました。');}catch(_){showToast('検査結果をコピーできませんでした。');}});
+  document.getElementById('copySystemCheck')?.addEventListener('click',async()=>{const rows=[...checkResults.querySelectorAll('tr')].map((row)=>[...row.children].map((cell)=>cell.textContent.trim()).join(' | ')); const summary=[`WANGAN WEB-13 シネマティック・最終チェック`,`検査件数: ${document.getElementById('checkTotal').textContent}`,`合格: ${document.getElementById('checkPass').textContent}`,`注意: ${document.getElementById('checkWarn').textContent}`,`失敗: ${document.getElementById('checkFail').textContent}`,'',...rows].join('\n'); try{await navigator.clipboard.writeText(summary);showToast('検査結果をコピーしました。');}catch(_){showToast('検査結果をコピーできませんでした。');}});
 
   const applyEnvironmentDisplay = () => {
     environmentChip.textContent = IS_DEMO ? 'DEMO' : 'PRODUCTION';
@@ -2495,6 +3035,7 @@ details:not([open]) .faq-answer,
     showToast('正式公開設定ファイルを保存しました。');
   });
 
+  const cinematicHeroReady = initializeCinematicHero();
   const motionObserverReady = initializeRevealMotion();
   applyEnvironmentDisplay();
   applyLineIntegration();
