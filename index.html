@@ -1202,7 +1202,7 @@ details:not([open]) .faq-answer,
   z-index:1;
   background:
     linear-gradient(90deg,rgba(2,4,6,.54),rgba(2,4,6,.14)),
-    url("drift-hero-poster.jpg") center/cover no-repeat;
+    url("drift-hero-wangan-poster.jpg") center/cover no-repeat;
 }
 .drift-video-stage.video-error .drift-hero-video{display:none}
 .drift-video-stage.video-error .drift-video-fallback{z-index:2}
@@ -1276,9 +1276,9 @@ details:not([open]) .faq-answer,
     loop
     playsinline
     preload="auto"
-    poster="drift-hero-poster.jpg"
+    poster="drift-hero-wangan-poster.jpg"
     tabindex="-1">
-    <source src="drift-hero.mp4" type="video/mp4">
+    <source src="drift-hero-wangan.mp4" type="video/mp4">
   </video>
   <div class="drift-video-fallback" aria-hidden="true"></div>
   <div class="cinematic-vignette"></div>
@@ -1289,9 +1289,9 @@ details:not([open]) .faq-answer,
 
 <div class="cinematic-hud" id="cinematicHud">
   <div class="cinematic-now">
-    <span class="cinematic-live"><i></i>ORIGINAL DRIFT FILM</span>
+    <span class="cinematic-live"><i></i>STREET HOUSE WANGAN</span>
     <strong id="cinematicLabel">夜の峠へ進入</strong>
-    <small id="cinematicSubLabel">STREET HOUSE / DRIFT SEQUENCE</small>
+    <small id="cinematicSubLabel">ORIGINAL WANGAN DRIFT SEQUENCE</small>
   </div>
 
   <div class="cinematic-controller">
@@ -1459,7 +1459,7 @@ details:not([open]) .faq-answer,
 <div class="actions"><a class="btn btn-primary" href="tel:08052410066">電話で相談　080-5241-0066</a><button class="btn btn-ghost js-open-estimate" type="button">DPRO WEB受付を開く</button><button class="btn btn-line js-line" type="button">LINEで相談</button></div><div class="dpro-site-note" id="environmentNote">
 <b id="environmentLabel">DPRO DEMO連動</b>
 <span id="environmentText">WEB受付内容を店舗管理画面へまとめて登録します。</span>
-<span class="version-badge">WEB-14 DRIFT FILM</span>
+<span class="version-badge">WEB-15 WANGAN BRAND FILM</span>
 </div>
 </div>
 </section>
@@ -1717,11 +1717,11 @@ details:not([open]) .faq-answer,
 </div>
 <section aria-hidden="true" class="system-check motion-reveal" id="systemCheck">
 <div class="check-shell">
-<header class="check-head"><div><p>INTERNAL SYSTEM CHECK</p><h1>WANGAN WEB-14 ドリフト動画・最終チェック</h1><small>通常のお客様画面には表示されません。URLへ <code>?system-check=1</code> を付けた場合のみ開きます。</small></div><button class="check-close" id="closeSystemCheck" type="button">サイトへ戻る</button></header>
+<header class="check-head"><div><p>INTERNAL SYSTEM CHECK</p><h1>WANGAN WEB-15 車体ロゴ統一・最終チェック</h1><small>通常のお客様画面には表示されません。URLへ <code>?system-check=1</code> を付けた場合のみ開きます。</small></div><button class="check-close" id="closeSystemCheck" type="button">サイトへ戻る</button></header>
 <div class="check-summary"><div><b id="checkTotal">0</b><span>検査件数</span></div><div><b id="checkPass">0</b><span>合格</span></div><div><b id="checkWarn">0</b><span>注意</span></div><div><b id="checkFail">0</b><span>失敗</span></div></div>
 <section class="final-delivery-card motion-reveal from-left">
 <span class="final-kicker">FINAL DELIVERY VERSION</span>
-<h2>WANGAN WEB-14 ドリフト動画版</h2>
+<h2>WANGAN WEB-15 STREET HOUSE WANGAN 動画版</h2>
 <p>デザイン、DPRO WEB受付、30分枠取得、二重送信防止、プライバシー、SEO、内部検査まで統合済みです。</p>
 <div class="final-delivery-meta">
 <span>GitHub Pages対応</span>
@@ -2284,19 +2284,24 @@ details:not([open]) .faq-answer,
     results.push(checkItem('受付控え保存',typeof downloadReceipt==='function'?'pass':'fail','テキスト形式で保存'));
     results.push(checkItem('WEB受付識別',APP_CONFIG.source==='WEB'&&Boolean(APP_CONFIG.sourceDetail)?'pass':'fail',`${APP_CONFIG.source} / ${APP_CONFIG.sourceDetail}`));
     results.push(checkItem('検査画面撮影対策',document.body.classList.contains('system-check-mode')?'pass':'warn','全ページ撮影時の固定画面重複を防止'));
-    results.push(checkItem('最終納品バージョン',document.querySelector('.version-badge')?.textContent.includes('WEB-14')?'pass':'fail',document.querySelector('.version-badge')?.textContent||'未確認'));
+    results.push(checkItem('最終納品バージョン',document.querySelector('.version-badge')?.textContent.includes('WEB-15')?'pass':'fail',document.querySelector('.version-badge')?.textContent||'未確認'));
     results.push(checkItem('正式公開設定生成',typeof buildProductionConfig==='function'&&typeof validateProductionConfig==='function'?'pass':'fail','APP_CONFIG一括生成'));
     results.push(checkItem('モーションCSS',document.documentElement.innerHTML.includes('STEP WANGAN-WEB-12: premium motion enhancement')?'pass':'fail','動き用スタイル'));
     results.push(checkItem('スクロール表示',typeof initializeRevealMotion==='function'?'pass':'fail','IntersectionObserver'));
     results.push(checkItem('ヒーロー演出',document.documentElement.innerHTML.includes('@keyframes heroSweep')?'pass':'fail','光演出・ズーム'));
     results.push(checkItem('CTA演出',document.documentElement.innerHTML.includes('box-shadow:0 14px 32px rgba(0,0,0,.28)')?'pass':'fail','ボタンのホバー演出'));
-    results.push(checkItem('ドリフトMP4動画',Boolean(document.getElementById('driftHeroVideo'))?'pass':'fail','10.5秒・1280×720'));
+    results.push(checkItem('ブランド統一MP4',Boolean(document.getElementById('driftHeroVideo'))?'pass':'fail','STREET HOUSE WANGAN・10.5秒'));
     results.push(checkItem('動画自動再生設定',document.getElementById('driftHeroVideo')?.autoplay&&document.getElementById('driftHeroVideo')?.muted?'pass':'fail','autoplay / muted'));
     results.push(checkItem('動画ループ設定',document.getElementById('driftHeroVideo')?.loop?'pass':'fail','loop / playsinline'));
-    results.push(checkItem('動画ポスター',document.getElementById('driftHeroVideo')?.poster.includes('drift-hero-poster.jpg')?'pass':'fail','読み込み前・失敗時表示'));
+    results.push(checkItem('動画ポスター',document.getElementById('driftHeroVideo')?.poster.includes('drift-hero-wangan-poster.jpg')?'pass':'fail','読み込み前・失敗時表示'));
     results.push(checkItem('動画再生操作',Boolean(document.getElementById('cinematicToggle'))?'pass':'fail','PLAY / PAUSE'));
     results.push(checkItem('動画シーン移動',document.querySelectorAll('[data-cinematic-index]').length===4?'pass':'fail','4場面へ直接移動'));
-    results.push(checkItem('動画ファイル分離',document.querySelector('#driftHeroVideo source')?.src.includes('drift-hero.mp4')?'pass':'fail','GitHubルート配置'));
+    results.push(checkItem('動画ファイル分離',document.querySelector('#driftHeroVideo source')?.src.includes('drift-hero-wangan.mp4')?'pass':'fail','GitHubルート配置'));
+    results.push(checkItem(
+      '車体ブランド表記',
+      document.querySelector('.cinematic-live')?.textContent.includes('STREET HOUSE WANGAN') ? 'pass' : 'fail',
+      'STREET HOUSE WANGAN'
+    ));
 
     results.push(checkItem('DPRO Worker HTTPS',/^https:\/\//.test(WORKER_API_BASE)?'pass':'fail',WORKER_API_BASE));
     results.push(checkItem('店舗コード',SHOP_CODE?'pass':'fail',SHOP_CODE||'未設定'));
@@ -2345,7 +2350,7 @@ details:not([open]) .faq-answer,
   };
   document.getElementById('runSystemCheck')?.addEventListener('click',runSystemChecks);
   document.getElementById('closeSystemCheck')?.addEventListener('click',()=>{location.href=APP_CONFIG.siteUrl;});
-  document.getElementById('copySystemCheck')?.addEventListener('click',async()=>{const rows=[...checkResults.querySelectorAll('tr')].map((row)=>[...row.children].map((cell)=>cell.textContent.trim()).join(' | ')); const summary=[`WANGAN WEB-14 ドリフト動画・最終チェック`,`検査件数: ${document.getElementById('checkTotal').textContent}`,`合格: ${document.getElementById('checkPass').textContent}`,`注意: ${document.getElementById('checkWarn').textContent}`,`失敗: ${document.getElementById('checkFail').textContent}`,'',...rows].join('\n'); try{await navigator.clipboard.writeText(summary);showToast('検査結果をコピーしました。');}catch(_){showToast('検査結果をコピーできませんでした。');}});
+  document.getElementById('copySystemCheck')?.addEventListener('click',async()=>{const rows=[...checkResults.querySelectorAll('tr')].map((row)=>[...row.children].map((cell)=>cell.textContent.trim()).join(' | ')); const summary=[`WANGAN WEB-15 車体ロゴ統一・最終チェック`,`検査件数: ${document.getElementById('checkTotal').textContent}`,`合格: ${document.getElementById('checkPass').textContent}`,`注意: ${document.getElementById('checkWarn').textContent}`,`失敗: ${document.getElementById('checkFail').textContent}`,'',...rows].join('\n'); try{await navigator.clipboard.writeText(summary);showToast('検査結果をコピーしました。');}catch(_){showToast('検査結果をコピーできませんでした。');}});
 
   const applyEnvironmentDisplay = () => {
     environmentChip.textContent = IS_DEMO ? 'DEMO' : 'PRODUCTION';
