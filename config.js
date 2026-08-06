@@ -1,13 +1,13 @@
 /**
  * STREET HOUSE WANGAN Website Public Config
- * STEP WANGAN-BIZ-8-R2
+ * STEP WANGAN-BIZ-8-R3
  *
  * 契約前の提案確認用サイトです。
  * 検索エンジン登録・サイトマップ送信・正式公開は行いません。
  * Supabaseキー、Service Role、管理コード、秘密情報は置きません。
  */
 window.DPRO_SITE_CONFIG = Object.freeze({
-  version: 'WANGAN-BIZ-8-R2-SITE-20260806',
+  version: 'WANGAN-BIZ-8-R3-SITE-20260806',
   environment: 'staging',
   releaseStage: 'proposal',
   contractStatus: 'not_contracted',
@@ -32,6 +32,14 @@ window.DPRO_SITE_CONFIG = Object.freeze({
   shopName: 'ストリートハウス湾岸通り',
   shopNameEnglish: 'STREET HOUSE WANGAN',
   businessCategoryLabel: '自動車修理・チューニング・自動車販売',
+  storeInfoAuthority: 'verified_static',
+  rejectDynamicPlaceholderPhone: true,
+  placeholderPhones: Object.freeze([
+    '0978-00-0000',
+    '0978000000',
+    '000-0000-0000',
+    '0000000000'
+  ]),
   defaultPhone: '080-5241-0066',
   primaryPhone: '080-5241-0066',
   fixedPhone: '0978-63-8706',
@@ -69,5 +77,5 @@ window.DPRO_SITE_CONFIG = Object.freeze({
 
   cacheMinutes: 5,
   source: 'WEB',
-  sourceDetail: 'street-house-wangan-line-dpro-integration-proposal'
+  sourceDetail: 'street-house-wangan-r3-store-info-and-responsive-audit'
 });

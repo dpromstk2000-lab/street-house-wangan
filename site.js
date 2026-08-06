@@ -29,6 +29,126 @@
     });
   }
 
+  const PHONE_TEXT_RE = /(?:0\d{1,4}[-－ー]?\d{1,4}[-－ー]?\d{3,4})/g;
+
+  function compactPhone(value) {
+    return String(value || '').replace(/[^\d+]/g, '');
+  }
+
+  function isPlaceholderPhone(value) {
+    const compact = compactPhone(value);
+    const configured = Array.isArray(CONFIG.placeholderPhones) ? CONFIG.placeholderPhones : [];
+    const blocked = configured.map(compactPhone);
+    return !compact
+      || blocked.includes(compact)
+      || /^0+$/.test(compact)
+      || /^(?:0978)?0{6,}$/.test(compact);
+  }
+
+  function verifiedPhone(kind = 'primary') {
+    const value = kind === 'fixed'
+      ? String(CONFIG.fixedPhone || '')
+      : String(CONFIG.primaryPhone || CONFIG.defaultPhone || '');
+    return value;
+  }
+
+  function phoneLooksNumeric(text) {
+    return /^[\s\d０-９\-－ー()（）+]+$/.test(String(text || '').trim());
+  }
+
+  function replacePhonePlaceholders(root, replacement) {
+    if (!root || !replacement) return;
+    const placeholders = [
+      ...(Array.isArray(CONFIG.placeholderPhones) ? CONFIG.placeholderPhones : []),
+      '0978-00-0000',
+      '0978000000'
+    ].filter(Boolean);
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(node => {
+      const parent = node.parentElement;
+      if (!parent || ['SCRIPT','STYLE','TEXTAREA'].includes(parent.tagName)) return;
+      let value = node.nodeValue || '';
+      placeholders.forEach(bad => {
+        value = value.split(bad).join(replacement);
+      });
+      if (node.nodeValue !== value) node.nodeValue = value;
+    });
+  }
+
+  function applyVerifiedStoreInfo() {
+    const primary = verifiedPhone('primary');
+    const fixed = verifiedPhone('fixed');
+    if (!primary) return;
+
+    replacePhonePlaceholders(document.body, primary);
+
+    document.querySelectorAll('a[href^="tel:"], [data-store-phone]').forEach(el => {
+      const kind = el.dataset.storePhone === 'fixed' ? 'fixed' : 'primary';
+      const value = kind === 'fixed' && fixed ? fixed : primary;
+      const expectedHref = normalizePhoneHref(value);
+
+      if (el.tagName === 'A' && el.getAttribute('href') !== expectedHref) {
+        el.setAttribute('href', expectedHref);
+      }
+
+      const currentText = (el.textContent || '').trim();
+      if (phoneLooksNumeric(currentText) || isPlaceholderPhone(currentText)) {
+        if (currentText !== value) el.textContent = value;
+      }
+    });
+
+    // Fixed/mobile rows are always restored even after dpro-site.js updates every tel link.
+    document.querySelectorAll('dt').forEach(dt => {
+      const label = (dt.textContent || '').trim();
+      const link = dt.parentElement?.querySelector('dd a');
+      if (!link) return;
+      if (label === '固定電話' && fixed) {
+        link.dataset.storePhone = 'fixed';
+        if (link.getAttribute('href') !== normalizePhoneHref(fixed)) link.href = normalizePhoneHref(fixed);
+        if ((link.textContent || '').trim() !== fixed) link.textContent = fixed;
+      }
+      if (label === '携帯電話') {
+        link.dataset.storePhone = 'primary';
+        if (link.getAttribute('href') !== normalizePhoneHref(primary)) link.href = normalizePhoneHref(primary);
+        if ((link.textContent || '').trim() !== primary) link.textContent = primary;
+      }
+    });
+
+    const jsonLd = document.getElementById('localBusinessJsonLd');
+    if (jsonLd) {
+      try {
+        const data = JSON.parse(jsonLd.textContent || '{}');
+        if (data.telephone !== primary) {
+          data.telephone = primary;
+          jsonLd.textContent = JSON.stringify(data);
+        }
+      } catch (_) {}
+    }
+  }
+
+  let storeInfoObserver = null;
+  let storeInfoQueued = false;
+  function initVerifiedStoreInfoGuard() {
+    if (!document.body || storeInfoObserver) return;
+    storeInfoObserver = new MutationObserver(() => {
+      if (storeInfoQueued) return;
+      storeInfoQueued = true;
+      requestAnimationFrame(() => {
+        storeInfoQueued = false;
+        applyVerifiedStoreInfo();
+      });
+    });
+    storeInfoObserver.observe(document.body, {
+      subtree: true,
+      childList: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ['href']
+    });
+  }
+
   function applyPublicBusinessInfo(runtime = window.DPRO_RUNTIME || {}) {
     const primaryPhone = String(CONFIG.primaryPhone || runtime.phone || CONFIG.defaultPhone || '');
     const fixedPhone = String(CONFIG.fixedPhone || '');
@@ -81,6 +201,8 @@
       if (label === '営業時間' && openingHours) dd.textContent = openingHours;
       if (label === '定休日' && regularHoliday) dd.textContent = regularHoliday;
     });
+
+    applyVerifiedStoreInfo();
   }
 
   function validPublicUrl(value) {
@@ -184,7 +306,7 @@
     const indexable = CONFIG.searchIndexEnabled === true;
     const pageUrl = absolutePageUrl();
     const ogImage = new URL(CONFIG.ogImage || 'ogp.jpg', ROOT).href;
-    const phone = String(runtime.phone || CONFIG.primaryPhone || CONFIG.defaultPhone || '');
+    const phone = String(CONFIG.primaryPhone || CONFIG.defaultPhone || runtime.phone || '');
 
     let robots = document.querySelector('meta[name="robots"]');
     if (!robots) {
@@ -332,7 +454,10 @@
     initReveal();
     initHeroVideo();
     initLineIntegrationInteraction();
+    initVerifiedStoreInfoGuard();
     applyAll();
+    setTimeout(applyVerifiedStoreInfo, 1200);
+    setTimeout(applyVerifiedStoreInfo, 3000);
 
     // DPROの動的店舗情報反映後に、共通情報と固定電話を最終整合させます。
     window.addEventListener('dpro:ready', event => {
@@ -343,5 +468,10 @@
     }, { passive: true });
   });
 
-  window.addEventListener('pageshow', () => setTimeout(() => applyAll(), 0));
+  window.addEventListener('pageshow', () => {
+    setTimeout(() => {
+      applyAll();
+      applyVerifiedStoreInfo();
+    }, 0);
+  });
 })();

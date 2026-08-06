@@ -1,4 +1,4 @@
-/* STEP WANGAN-BIZ-8-R2
+/* STEP WANGAN-BIZ-8-R3
    WEBSITE × LINE公式 × DPRO 統合訴求
 -------------------------------------------------------------- */
 .dpro-integration-section {
@@ -314,4 +314,173 @@
   .dpro-central-hub { padding: 22px 17px; }
   .dpro-record-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dpro-line-action { width: 100%; min-width: 0; }
+}
+
+
+/* STEP WANGAN-BIZ-8-R3
+   全ページ見出し・改行・店舗情報表示の再検査
+-------------------------------------------------------------- */
+:where(h1, h2, h3).audited-heading,
+:where(h1, h2, h3).heading-balanced {
+  text-wrap: balance;
+  line-break: strict;
+  word-break: normal;
+  overflow-wrap: normal;
+  hanging-punctuation: allow-end;
+}
+
+.audited-heading .heading-line {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+/* WEBSITE × LINE × DPRO */
+.dpro-integration-section .section-head {
+  grid-template-columns: minmax(520px, 1.25fr) minmax(300px, .75fr) !important;
+  gap: clamp(30px, 5vw, 76px) !important;
+  align-items: end !important;
+}
+.dpro-integration-section .section-head h2 {
+  max-width: 760px;
+  margin-right: auto;
+  font-size: clamp(42px, 4.8vw, 66px) !important;
+  line-height: 1.13 !important;
+  letter-spacing: -.045em !important;
+}
+.dpro-central-hub {
+  grid-template-columns: minmax(460px, 1.08fr) minmax(0, .92fr) !important;
+  gap: clamp(28px, 4vw, 58px) !important;
+}
+.dpro-central-hub h3 {
+  max-width: 540px;
+  font-size: clamp(32px, 3.35vw, 46px) !important;
+  line-height: 1.18 !important;
+  letter-spacing: -.035em;
+}
+
+/* Standard business sections */
+.business-section .section-head h2 {
+  text-wrap: balance;
+  line-break: strict;
+}
+.split-copy h2.heading-split {
+  max-width: 11em;
+  font-size: clamp(36px, 4vw, 52px) !important;
+  line-height: 1.18 !important;
+}
+.section-head h2.heading-single {
+  width: max-content;
+  max-width: 100%;
+  white-space: nowrap;
+  font-size: clamp(36px, 4.2vw, 54px) !important;
+}
+.section-head h2.heading-unified {
+  max-width: 720px;
+  font-size: clamp(40px, 4.5vw, 60px) !important;
+  line-height: 1.14 !important;
+}
+
+/* Bottom contact CTA: prevent the final one or two characters from orphaning. */
+.cta-band-inner {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: clamp(28px, 4vw, 66px) !important;
+  align-items: center !important;
+}
+.cta-band h2.heading-cta {
+  max-width: 820px;
+  font-size: clamp(36px, 4.25vw, 55px) !important;
+  line-height: 1.18 !important;
+  letter-spacing: -.04em !important;
+}
+.cta-band h2.heading-cta .heading-line:last-child {
+  white-space: nowrap;
+}
+
+/* Phone numbers should remain readable and never wrap digit by digit. */
+a[data-store-phone],
+.info-list a[href^="tel:"],
+.footer-links a[href^="tel:"] {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+}
+
+@media (max-width: 1040px) {
+  .dpro-integration-section .section-head {
+    grid-template-columns: 1fr !important;
+    gap: 22px !important;
+  }
+  .dpro-integration-section .section-head h2 {
+    font-size: clamp(40px, 6.3vw, 58px) !important;
+  }
+  .dpro-central-hub {
+    grid-template-columns: 1fr !important;
+  }
+  .cta-band-inner {
+    grid-template-columns: 1fr !important;
+  }
+  .cta-band h2.heading-cta {
+    max-width: 850px;
+  }
+}
+
+@media (max-width: 720px) {
+  .audited-heading .heading-line {
+    max-width: 100%;
+  }
+  .dpro-integration-section .section-head h2 {
+    font-size: clamp(38px, 10.5vw, 50px) !important;
+    line-height: 1.15 !important;
+  }
+  .dpro-central-hub h3 {
+    font-size: clamp(30px, 8.4vw, 40px) !important;
+  }
+  .split-copy h2.heading-split {
+    font-size: clamp(34px, 9.2vw, 44px) !important;
+  }
+  .section-head h2.heading-single {
+    font-size: clamp(34px, 9vw, 44px) !important;
+  }
+  .section-head h2.heading-unified {
+    font-size: clamp(36px, 9.8vw, 48px) !important;
+  }
+  .cta-band h2.heading-cta {
+    font-size: clamp(31px, 8.5vw, 42px) !important;
+  }
+  .cta-band h2.heading-cta .heading-line:last-child {
+    width: min(12em, 100%);
+    white-space: normal;
+    text-wrap: balance;
+  }
+}
+
+@media (max-width: 430px) {
+  .dpro-integration-section .section-head h2 {
+    font-size: 39px !important;
+  }
+  .dpro-central-hub h3 {
+    font-size: 33px !important;
+  }
+  .split-copy h2.heading-split,
+  .section-head h2.heading-single {
+    font-size: 34px !important;
+  }
+  .section-head h2.heading-unified {
+    font-size: 36px !important;
+  }
+  .cta-band h2.heading-cta {
+    font-size: 31px !important;
+  }
+}
+
+
+/* Explicit audited selectors for the two primary R3 headings. */
+h2.heading-integration .heading-line,
+h3.heading-hub .heading-line {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  white-space: nowrap;
 }
