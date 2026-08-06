@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>WANGAN-BIZ-6 RELEASE CHECK</title>
+  <style>
+    :root{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;color:#e8edf2;background:#0b1117}
+    *{box-sizing:border-box}body{margin:0;padding:30px}.wrap{max-width:1180px;margin:auto}
+    h1{font-size:clamp(28px,5vw,54px);margin:8px 0}.lead{color:#aeb8c3;line-height:1.7}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0}
+    .sum,.panel{background:#121b24;border:1px solid #263341;border-radius:10px;padding:18px}
+    .sum b{display:block;font-size:30px;margin-top:6px}.ok{color:#4ade80}.warn{color:#facc15}.ng{color:#fb7185}
+    button,a.btn{border:0;background:#f2c515;color:#111827;padding:12px 18px;font-weight:900;cursor:pointer;text-decoration:none;display:inline-block}
+    table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}th,td{text-align:left;padding:11px;border-bottom:1px solid #263341;vertical-align:top}
+    th{color:#9fb0c1}.badge{display:inline-block;padding:3px 8px;border-radius:999px;font-weight:900}
+    .badge.ok{background:#143b28}.badge.warn{background:#463c12}.badge.ng{background:#491b27}
+    code{white-space:pre-wrap;word-break:break-all;color:#cbd5e1}.links{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+    @media(max-width:760px){body{padding:18px}.summary{grid-template-columns:repeat(2,1fr)}.table-wrap{overflow:auto}}
+  </style>
+  <script src="config.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <small>INTERNAL RELEASE CHECK / OWNER非公開</small>
+  <h1>WANGAN-BIZ-6</h1>
+  <p class="lead">公開ページ、共通設定、SEO、主要ファイル、DPRO APIを一括確認します。このページはサイト来訪者へ案内しません。</p>
+  <div class="links">
+    <button id="run">一括検査を実行</button>
+    <a class="btn" href="index.html">公開サイトへ</a>
+    <a class="btn" href="https://dpromstk2000-lab.github.io/line-shaken-liff/dashboard.html?ver=R6">DPRO管理画面へ</a>
+  </div>
+  <div class="summary">
+    <div class="sum">合格<b id="okCount" class="ok">0</b></div>
+    <div class="sum">注意<b id="warnCount" class="warn">0</b></div>
+    <div class="sum">不合格<b id="ngCount" class="ng">0</b></div>
+    <div class="sum">検査数<b id="totalCount">0</b></div>
+  </div>
+  <section class="panel">
+    <h2>検査結果</h2>
+    <div class="table-wrap"><table><thead><tr><th>対象</th><th>判定</th><th>内容</th></tr></thead><tbody id="results"></tbody></table></div>
+  </section>
+</div>
+<script>
+(() => {
+  const C = window.DPRO_SITE_CONFIG || {};
+  const root = String(C.siteBaseUrl || new URL('./', location.href)).replace(/\/?$/, '/');
+  const rows = [];
+  const add = (target, status, message) => rows.push({target,status,message});
+  const escapeHtml = v => String(v ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+
+  async function fetchText(url, timeout=15000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+    try {
+      const res = await fetch(url, {cache:'no-store', signal:controller.signal});
+      return {ok:res.ok, status:res.status, text:await res.text()};
+    } finally { clearTimeout(timer); }
+  }
+
+  async function checkPage(file) {
+    const url = new URL(file === 'index.html' ? './' : file, root).href;
+    try {
+      const res = await fetchText(url);
+      if (!res.ok) { add(file,'ng',`HTTP ${res.status}`); return; }
+      const doc = new DOMParser().parseFromString(res.text,'text/html');
+      const missing = [];
+      if (!doc.title.trim()) missing.push('title');
+      if (!doc.querySelector('h1')) missing.push('h1');
+      if (!doc.querySelector('meta[name="description"]')?.content) missing.push('description');
+      if (!doc.querySelector('link[rel="canonical"]')) missing.push('canonical');
+      if (!doc.querySelector('meta[name="robots"]')) missing.push('robots');
+      if (![...doc.scripts].some(s => (s.getAttribute('src')||'').includes('config.js'))) missing.push('config.js');
+      if (![...doc.scripts].some(s => (s.getAttribute('src')||'').includes('site.js'))) missing.push('site.js');
+      const protectedNames = ['SUPABASE' + '_SERVICE_ROLE', 'SESSION' + '_SECRET', 'SERVICE' + '_ROLE_KEY'];
+      const dangerous = protectedNames.some(name => res.text.includes(name)) || /Bearer\s+[A-Za-z0-9._-]{20,}/i.test(res.text);
+      const placeholders = /(0978-00-0000|test@example\.com|TODO|＜アカウント名＞)/i.test(res.text);
+      if (dangerous) add(file,'ng','公開HTML内に秘密情報らしき文字列があります');
+      else if (missing.length) add(file,'ng',`不足: ${missing.join(', ')}`);
+      else if (placeholders) add(file,'warn','仮情報らしき文字列があります');
+      else add(file,'ok',`${doc.title} / 基本SEO・共通JS正常`);
+    } catch (error) { add(file,'ng',error.message); }
+  }
+
+  async function checkAsset(file, required=true) {
+    try {
+      const res = await fetch(new URL(file, root), {method:'GET', cache:'no-store'});
+      if (res.ok) add(file,'ok',`HTTP ${res.status}`);
+      else add(file,required?'ng':'warn',`HTTP ${res.status}`);
+    } catch (error) { add(file,required?'ng':'warn',error.message); }
+  }
+
+  async function run() {
+    rows.length = 0;
+    document.getElementById('results').innerHTML = '<tr><td colspan="3">検査中...</td></tr>';
+
+    add('config.version', /^WANGAN-BIZ-6/.test(C.version || '') ? 'ok' : 'ng', C.version || '未設定');
+    add('公開段階', C.searchIndexEnabled === true ? 'warn' : 'ok',
+      C.searchIndexEnabled === true ? '検索公開ONです。店舗承認済みか確認してください。' : '検索公開OFF（本番前として正常）');
+    add('LINE公式URL', C.defaultLineUrl ? 'ok' : 'warn', C.defaultLineUrl || '未設定のためLINE導線は非表示');
+
+    const pages = C.publicPages || ['index.html','services.html','maintenance.html','custom.html','pricing.html','works.html','about.html','contact.html','privacy.html'];
+    for (const page of pages) await checkPage(page);
+
+    for (const asset of ['site.css','config.js','site.js','dpro-site.js','estimate.js','ogp.jpg','robots.txt','sitemap.xml','404.html']) {
+      await checkAsset(asset, asset !== 'estimate.js' || pages.includes('contact.html'));
+    }
+
+    try {
+      const api = await fetchText(`${String(C.apiBase||'').replace(/\/+$/,'')}/health?step=WANGAN-BIZ-6-RELEASE-CHECK`);
+      const data = JSON.parse(api.text || '{}');
+      if (api.ok && data.ok === true && data.status === 'healthy') {
+        add('DPRO Website API','ok',`${data.version || ''} / DB ${data.databaseVersion || ''}`);
+      } else add('DPRO Website API','ng',api.text.slice(0,300));
+    } catch (error) { add('DPRO Website API','ng',error.message); }
+
+    const counts = {ok:0,warn:0,ng:0};
+    rows.forEach(row => counts[row.status]++);
+    document.getElementById('okCount').textContent = counts.ok;
+    document.getElementById('warnCount').textContent = counts.warn;
+    document.getElementById('ngCount').textContent = counts.ng;
+    document.getElementById('totalCount').textContent = rows.length;
+    document.getElementById('results').innerHTML = rows.map(row =>
+      `<tr><td><code>${escapeHtml(row.target)}</code></td><td><span class="badge ${row.status}">${row.status==='ok'?'合格':row.status==='warn'?'注意':'不合格'}</span></td><td>${escapeHtml(row.message)}</td></tr>`
+    ).join('');
+  }
+
+  document.getElementById('run').addEventListener('click', run);
+  run();
+})();
+</script>
+</body>
+</html>

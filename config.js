@@ -1,20 +1,57 @@
 /**
  * STREET HOUSE WANGAN Website Public Config
- * STEP WANGAN-BIZ-5
- * 公開してよい値だけを置きます。Supabaseキーや管理コードは置きません。
+ * STEP WANGAN-BIZ-6
+ *
+ * 公開してよい店舗情報だけを置きます。
+ * Supabaseキー、Service Role、管理コード、秘密情報は置きません。
+ *
+ * 本番検索公開は searchIndexEnabled を true に変更するだけで切替できます。
+ * 現在は店舗確認中のため false のままです。
  */
 window.DPRO_SITE_CONFIG = Object.freeze({
-  version: 'WANGAN-BIZ-5-SITE-20260806',
+  version: 'WANGAN-BIZ-6-SITE-20260806',
   environment: 'demo',
+  releaseStage: 'staging',
+
   apiBase: 'https://dpro-wangan-biz-api.dpromstk2000.workers.dev',
   shopCode: 'street_house_kitsuki',
   timezone: 'Asia/Tokyo',
-  defaultPhone: '080-5241-0066',
-  defaultLineUrl: '',
-  defaultMapUrl: '',
-  siteBaseUrl: '',
-  cacheMinutes: 5,
+
+  siteBaseUrl: 'https://dpromstk2000-lab.github.io/street-house-wangan/',
   searchIndexEnabled: false,
+  ogImage: 'ogp.jpg',
+
+  shopName: 'ストリートハウス湾岸通り',
+  shopNameEnglish: 'STREET HOUSE WANGAN',
+  defaultPhone: '080-5241-0066',
+  primaryPhone: '080-5241-0066',
+  fixedPhone: '0978-63-8706',
+
+  postalCode: '873-0033',
+  addressRegion: '大分県',
+  addressLocality: '杵築市',
+  streetAddress: '大字守江1291-3',
+  fullAddress: '大分県杵築市大字守江1291-3',
+
+  openingHoursLabel: '9:00〜19:00',
+  emergencyHoursLabel: '夜間・休日は緊急時応相談',
+
+  defaultLineUrl: '',
+  defaultMapUrl: 'https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E5%88%86%E7%9C%8C%E6%9D%B5%E7%AF%89%E5%B8%82%E5%A4%A7%E5%AD%97%E5%AE%88%E6%B1%9F1291-3',
+
+  publicPages: Object.freeze([
+    'index.html',
+    'services.html',
+    'maintenance.html',
+    'custom.html',
+    'pricing.html',
+    'works.html',
+    'about.html',
+    'contact.html',
+    'privacy.html'
+  ]),
+
+  cacheMinutes: 5,
   source: 'WEB',
   sourceDetail: 'street-house-wangan-business'
 });

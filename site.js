@@ -1,34 +1,240 @@
-
 (() => {
   'use strict';
-  const menu = document.querySelector('.menu');
-  const nav = document.querySelector('.nav');
-  menu?.addEventListener('click', () => {
-    const open = nav?.classList.toggle('open');
-    menu.setAttribute('aria-expanded', String(Boolean(open)));
-  });
-  nav?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-    nav.classList.remove('open');
-    menu?.setAttribute('aria-expanded','false');
-  }));
 
-  const reveal = [...document.querySelectorAll('.motion-reveal')];
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
-      if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
-    }), {threshold:.12, rootMargin:'0px 0px -35px'});
-    reveal.forEach(el => observer.observe(el));
-  } else reveal.forEach(el => el.classList.add('is-visible'));
+  const CONFIG = window.DPRO_SITE_CONFIG || {};
+  const ROOT = String(CONFIG.siteBaseUrl || 'https://dpromstk2000-lab.github.io/street-house-wangan/')
+    .replace(/\/?$/, '/');
 
-  const video = document.getElementById('heroVideo');
-  const toggle = document.getElementById('heroVideoToggle');
-  toggle?.addEventListener('click', async () => {
+  const normalizePhoneHref = value => `tel:${String(value || '').replace(/[^0-9+]/g, '')}`;
+  const currentPage = () => {
+    const file = location.pathname.split('/').pop();
+    return file || 'index.html';
+  };
+  const absolutePageUrl = () => currentPage() === 'index.html' ? ROOT : new URL(currentPage(), ROOT).href;
+
+  function setMeta(selector, attribute, value) {
+    const el = document.querySelector(selector);
+    if (el && value) el.setAttribute(attribute, value);
+  }
+
+  function replaceExactText(root, from, to) {
+    if (!root || !from || !to || from === to) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(node => {
+      if (node.nodeValue && node.nodeValue.includes(from)) {
+        node.nodeValue = node.nodeValue.split(from).join(to);
+      }
+    });
+  }
+
+  function applyPublicBusinessInfo(runtime = window.DPRO_RUNTIME || {}) {
+    const primaryPhone = String(runtime.phone || CONFIG.primaryPhone || CONFIG.defaultPhone || '');
+    const fixedPhone = String(CONFIG.fixedPhone || '');
+    const fullAddress = String(CONFIG.fullAddress || '');
+
+    if (fullAddress) {
+      replaceExactText(document.body, '大分県杵築市大字守江1291-3', fullAddress);
+      replaceExactText(document.body, '〒873-0033 大分県杵築市大字守江1291-3',
+        `〒${CONFIG.postalCode || '873-0033'} ${fullAddress}`);
+    }
+
+    document.querySelectorAll('[data-dpro-phone]').forEach(el => {
+      el.textContent = primaryPhone;
+      if (el.tagName === 'A') el.href = normalizePhoneHref(primaryPhone);
+    });
+
+    // dpro-site.jsが一般のtelリンクを更新した後でも、固定電話欄だけは固定電話へ戻します。
+    document.querySelectorAll('dt').forEach(dt => {
+      if ((dt.textContent || '').trim() !== '固定電話') return;
+      const link = dt.parentElement?.querySelector('dd a[href^="tel:"]');
+      if (link && fixedPhone) {
+        link.textContent = fixedPhone;
+        link.href = normalizePhoneHref(fixedPhone);
+        link.dataset.dproStaticPhone = 'fixed';
+      }
+    });
+
+    document.querySelectorAll('[data-dpro-line]').forEach(el => {
+      const lineUrl = String(runtime.lineUrl || CONFIG.defaultLineUrl || '');
+      if (lineUrl) {
+        el.href = lineUrl;
+        el.hidden = false;
+        el.classList.remove('is-disabled');
+      } else {
+        el.removeAttribute('href');
+        el.hidden = true;
+        el.classList.add('is-disabled');
+      }
+    });
+
+    document.querySelectorAll('[data-dpro-map]').forEach(el => {
+      const mapUrl = String(runtime.mapUrl || CONFIG.defaultMapUrl || '');
+      if (mapUrl) {
+        el.href = mapUrl;
+        el.hidden = false;
+      }
+    });
+  }
+
+  function applySeo(runtime = window.DPRO_RUNTIME || {}) {
+    const indexable = CONFIG.searchIndexEnabled === true;
+    const pageUrl = absolutePageUrl();
+    const ogImage = new URL(CONFIG.ogImage || 'ogp.jpg', ROOT).href;
+    const phone = String(runtime.phone || CONFIG.primaryPhone || CONFIG.defaultPhone || '');
+
+    let robots = document.querySelector('meta[name="robots"]');
+    if (!robots) {
+      robots = document.createElement('meta');
+      robots.name = 'robots';
+      document.head.appendChild(robots);
+    }
+    robots.content = indexable
+      ? 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'
+      : 'noindex,nofollow';
+
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
+    }
+    canonical.href = pageUrl;
+
+    setMeta('meta[property="og:url"]', 'content', pageUrl);
+    setMeta('meta[property="og:image"]', 'content', ogImage);
+    setMeta('meta[name="twitter:image"]', 'content', ogImage);
+
+    const jsonLd = document.getElementById('localBusinessJsonLd');
+    if (jsonLd) {
+      let data = {};
+      try { data = JSON.parse(jsonLd.textContent || '{}'); } catch (_) {}
+      data['@context'] = 'https://schema.org';
+      data['@type'] = 'AutoRepair';
+      data.name = CONFIG.shopName || data.name;
+      data.url = ROOT;
+      data.telephone = phone;
+      data.image = ogImage;
+      data.address = {
+        '@type': 'PostalAddress',
+        streetAddress: CONFIG.streetAddress || '',
+        addressLocality: CONFIG.addressLocality || '',
+        addressRegion: CONFIG.addressRegion || '',
+        postalCode: CONFIG.postalCode || '',
+        addressCountry: 'JP'
+      };
+      data.priceRange = data.priceRange || '¥¥';
+      const sameAs = [runtime.lineUrl || CONFIG.defaultLineUrl].filter(Boolean);
+      if (sameAs.length) data.sameAs = sameAs;
+      else delete data.sameAs;
+      jsonLd.textContent = JSON.stringify(data);
+    }
+
+    document.body.dataset.releaseStage = CONFIG.releaseStage || 'staging';
+    document.body.dataset.environment = CONFIG.environment || 'demo';
+  }
+
+  function applyNavigationAccessibility() {
+    document.querySelectorAll('.nav a.active').forEach(link => link.setAttribute('aria-current', 'page'));
+    document.querySelectorAll('a[target="_blank"]').forEach(link => {
+      const rel = new Set(String(link.rel || '').split(/\s+/).filter(Boolean));
+      rel.add('noopener');
+      rel.add('noreferrer');
+      link.rel = [...rel].join(' ');
+    });
+  }
+
+  function initMenu() {
+    const menu = document.querySelector('.menu');
+    const nav = document.querySelector('.nav');
+    const close = () => {
+      nav?.classList.remove('open');
+      menu?.setAttribute('aria-expanded', 'false');
+    };
+    menu?.addEventListener('click', () => {
+      const open = nav?.classList.toggle('open');
+      menu.setAttribute('aria-expanded', String(Boolean(open)));
+    });
+    nav?.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') close();
+    });
+    document.addEventListener('click', event => {
+      if (!nav?.classList.contains('open')) return;
+      if (nav.contains(event.target) || menu?.contains(event.target)) return;
+      close();
+    });
+  }
+
+  function initReveal() {
+    const reveal = [...document.querySelectorAll('.motion-reveal')];
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      }), { threshold: .12, rootMargin: '0px 0px -35px' });
+      reveal.forEach(el => observer.observe(el));
+    } else {
+      reveal.forEach(el => el.classList.add('is-visible'));
+    }
+  }
+
+  function initHeroVideo() {
+    const video = document.getElementById('heroVideo');
+    const toggle = document.getElementById('heroVideoToggle');
     if (!video) return;
-    if (video.paused) { try { await video.play(); } catch (_) {} }
-    else video.pause();
-    toggle.textContent = video.paused ? '▶ PLAY' : 'Ⅱ PAUSE';
-    toggle.setAttribute('aria-pressed', String(video.paused));
+
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) {
+      video.pause();
+      if (toggle) {
+        toggle.textContent = '▶ PLAY';
+        toggle.setAttribute('aria-pressed', 'true');
+      }
+    }
+
+    toggle?.addEventListener('click', async () => {
+      if (video.paused) {
+        try { await video.play(); } catch (_) {}
+      } else {
+        video.pause();
+      }
+      toggle.textContent = video.paused ? '▶ PLAY' : 'Ⅱ PAUSE';
+      toggle.setAttribute('aria-pressed', String(video.paused));
+    });
+    video.addEventListener('play', () => {
+      if (toggle) toggle.textContent = 'Ⅱ PAUSE';
+    });
+    video.addEventListener('pause', () => {
+      if (toggle) toggle.textContent = '▶ PLAY';
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && !video.paused) video.pause();
+    });
+  }
+
+  function applyAll(runtime) {
+    applySeo(runtime);
+    applyPublicBusinessInfo(runtime);
+    applyNavigationAccessibility();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initMenu();
+    initReveal();
+    initHeroVideo();
+    applyAll();
+
+    // DPROの動的店舗情報反映後に、共通情報と固定電話を最終整合させます。
+    window.addEventListener('dpro:ready', event => {
+      const runtime = event.detail || window.DPRO_RUNTIME || {};
+      setTimeout(() => applyAll(runtime), 0);
+      setTimeout(() => applyAll(runtime), 250);
+    }, { passive: true });
   });
-  video?.addEventListener('play', () => { if(toggle) toggle.textContent='Ⅱ PAUSE'; });
-  video?.addEventListener('pause', () => { if(toggle) toggle.textContent='▶ PLAY'; });
+
+  window.addEventListener('pageshow', () => setTimeout(() => applyAll(), 0));
 })();
