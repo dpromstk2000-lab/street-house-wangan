@@ -1,6 +1,6 @@
 /**
  * STREET HOUSE WANGAN Website Public Config
- * STEP WANGAN-BIZ-6
+ * STEP WANGAN-BIZ-7
  *
  * 公開してよい店舗情報だけを置きます。
  * Supabaseキー、Service Role、管理コード、秘密情報は置きません。
@@ -9,9 +9,9 @@
  * 現在は店舗確認中のため false のままです。
  */
 window.DPRO_SITE_CONFIG = Object.freeze({
-  version: 'WANGAN-BIZ-6-SITE-20260806',
-  environment: 'demo',
-  releaseStage: 'staging',
+  version: 'WANGAN-BIZ-7-SITE-20260806',
+  environment: 'staging',
+  releaseStage: 'prelaunch',
 
   apiBase: 'https://dpro-wangan-biz-api.dpromstk2000.workers.dev',
   shopCode: 'street_house_kitsuki',
@@ -19,6 +19,9 @@ window.DPRO_SITE_CONFIG = Object.freeze({
 
   siteBaseUrl: 'https://dpromstk2000-lab.github.io/street-house-wangan/',
   searchIndexEnabled: false,
+  showPublicEnvironmentBadge: false,
+  stripTrackingFromOperationalRecords: true,
+  schemaOpeningHours: '',
   ogImage: 'ogp.jpg',
 
   shopName: 'ストリートハウス湾岸通り',

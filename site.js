@@ -125,6 +125,8 @@
         addressCountry: 'JP'
       };
       data.priceRange = data.priceRange || '¥¥';
+      if (CONFIG.schemaOpeningHours) data.openingHours = CONFIG.schemaOpeningHours;
+      else { delete data.openingHours; delete data.openingHoursSpecification; }
       const sameAs = [runtime.lineUrl || CONFIG.defaultLineUrl].filter(Boolean);
       if (sameAs.length) data.sameAs = sameAs;
       else delete data.sameAs;

@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  // STEP WANGAN-BIZ-5-R5: 入力内容ごとの二重送信防止キー管理
+  // STEP WANGAN-BIZ-7: 本番公開前の受付情報整理・追跡URL分離
 
   const CONFIG = window.DPRO_SITE_CONFIG || {};
   const API_BASE = String(CONFIG.apiBase || 'https://dpro-wangan-biz-api.dpromstk2000.workers.dev').replace(/\/+$/, '');
@@ -9,8 +9,8 @@
   const ENVIRONMENT = String(CONFIG.environment || 'demo');
   const MAX_FILES = 5;
   const MAX_FILE_BYTES = 8 * 1024 * 1024;
-  const DRAFT_KEY = `wanganBiz5Draft:${SHOP_CODE}`;
-  const REQUEST_KEY = `wanganBiz5RequestId:${SHOP_CODE}`;
+  const DRAFT_KEY = `wanganBiz7Draft:${SHOP_CODE}`;
+  const REQUEST_KEY = `wanganBiz7RequestId:${SHOP_CODE}`;
 
   const modeInfo = {
     instant: {
@@ -582,8 +582,10 @@
       message: [d.email ? `メール：${d.email}` : '', d.partsInfo ? `持込部品等：${d.partsInfo}` : '', d.message || ''].filter(Boolean).join('\n'),
       shakenYear: d.shakenYear || '', shakenMonth: d.shakenMonth || '',
       privacyAgreed: true, privacyAgreedAt: new Date().toISOString(),
-      sourceChannel: 'WEBSITE', sourcePage: `${location.pathname}${location.search}`,
-      pageUrl: location.href, idempotencyKey: requestId(), ...utm()
+      sourceChannel: 'WEBSITE',
+      sourcePage: CONFIG.stripTrackingFromOperationalRecords === false ? `${location.pathname}${location.search}` : location.pathname,
+      pageUrl: CONFIG.stripTrackingFromOperationalRecords === false ? location.href : `${location.origin}${location.pathname}`,
+      idempotencyKey: requestId(), ...utm()
     };
     if (currentMode === 'inquiry') return { ...common, preferredVisitDate: d.preferredVisitDate || '', preferredVisitTime: d.preferredVisitTime || '', attachmentIds, customerMode: 'new', vehicleMode: 'new' };
     return { ...common, reservationDate: d.reservationDate, reservationTime: d.reservationTime, nextShakenDate: d.shakenYear && d.shakenMonth ? `${d.shakenYear}-${String(d.shakenMonth).padStart(2, '0')}-01` : '' };
@@ -810,9 +812,15 @@
     }
   };
 
-  console.info('WANGAN-BIZ-5-R4 submit feedback active');
-  els.envChip.textContent = ENVIRONMENT === 'production' ? 'PRODUCTION' : 'DEMO';
-  els.envChip.classList.toggle('production', ENVIRONMENT === 'production');
+  console.info('WANGAN-BIZ-7 prelaunch reception active');
+  if (els.envChip) {
+    const showEnvironmentBadge = CONFIG.showPublicEnvironmentBadge === true;
+    els.envChip.hidden = !showEnvironmentBadge;
+    if (showEnvironmentBadge) {
+      els.envChip.textContent = ENVIRONMENT === 'production' ? 'PRODUCTION' : ENVIRONMENT.toUpperCase();
+      els.envChip.classList.toggle('production', ENVIRONMENT === 'production');
+    }
+  }
   populateYears(); renderPhotos(); resetTimeOptions();
   loadBootstrap().then(restoreDraft);
 })();

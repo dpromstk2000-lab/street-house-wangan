@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>WANGAN-BIZ-6 RELEASE CHECK</title>
+  <title>WANGAN-BIZ-7 RELEASE CHECK</title>
   <style>
     :root{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;color:#e8edf2;background:#0b1117}
     *{box-sizing:border-box}body{margin:0;padding:30px}.wrap{max-width:1180px;margin:auto}
@@ -24,12 +24,12 @@
 <body>
 <div class="wrap">
   <small>INTERNAL RELEASE CHECK / OWNER非公開</small>
-  <h1>WANGAN-BIZ-6</h1>
+  <h1>WANGAN-BIZ-7</h1>
   <p class="lead">公開ページ、共通設定、SEO、主要ファイル、DPRO APIを一括確認します。このページはサイト来訪者へ案内しません。</p>
   <div class="links">
     <button id="run">一括検査を実行</button>
     <a class="btn" href="index.html">公開サイトへ</a>
-    <a class="btn" href="https://dpromstk2000-lab.github.io/line-shaken-liff/dashboard.html?ver=R6">DPRO管理画面へ</a>
+    <a class="btn" href="https://dpromstk2000-lab.github.io/line-shaken-liff/dashboard.html?ver=WANGAN-BIZ-7">DPRO管理画面へ</a>
   </div>
   <div class="summary">
     <div class="sum">合格<b id="okCount" class="ok">0</b></div>
@@ -75,7 +75,7 @@
       if (![...doc.scripts].some(s => (s.getAttribute('src')||'').includes('site.js'))) missing.push('site.js');
       const protectedNames = ['SUPABASE' + '_SERVICE_ROLE', 'SESSION' + '_SECRET', 'SERVICE' + '_ROLE_KEY'];
       const dangerous = protectedNames.some(name => res.text.includes(name)) || /Bearer\s+[A-Za-z0-9._-]{20,}/i.test(res.text);
-      const placeholders = /(0978-00-0000|test@example\.com|TODO|＜アカウント名＞)/i.test(res.text);
+      const placeholders = /(0978-00-0000|test@example\.com|TODO|＜アカウント名＞|サイトデザイン確認用|正式運用では)/i.test(res.text);
       if (dangerous) add(file,'ng','公開HTML内に秘密情報らしき文字列があります');
       else if (missing.length) add(file,'ng',`不足: ${missing.join(', ')}`);
       else if (placeholders) add(file,'warn','仮情報らしき文字列があります');
@@ -95,10 +95,12 @@
     rows.length = 0;
     document.getElementById('results').innerHTML = '<tr><td colspan="3">検査中...</td></tr>';
 
-    add('config.version', /^WANGAN-BIZ-6/.test(C.version || '') ? 'ok' : 'ng', C.version || '未設定');
+    add('config.version', /^WANGAN-BIZ-7/.test(C.version || '') ? 'ok' : 'ng', C.version || '未設定');
     add('公開段階', C.searchIndexEnabled === true ? 'warn' : 'ok',
       C.searchIndexEnabled === true ? '検索公開ONです。店舗承認済みか確認してください。' : '検索公開OFF（本番前として正常）');
     add('LINE公式URL', C.defaultLineUrl ? 'ok' : 'warn', C.defaultLineUrl || '未設定のためLINE導線は非表示');
+    add('公開環境表示', C.showPublicEnvironmentBadge === false ? 'ok' : 'warn', C.showPublicEnvironmentBadge === false ? 'お客様画面の環境バッジは非表示' : '環境バッジが公開表示されます');
+    add('受付URL整理', C.stripTrackingFromOperationalRecords === true ? 'ok' : 'warn', C.stripTrackingFromOperationalRecords === true ? '運用記録から検査用クエリを除外' : '受付ページURLへクエリが残ります');
 
     const pages = C.publicPages || ['index.html','services.html','maintenance.html','custom.html','pricing.html','works.html','about.html','contact.html','privacy.html'];
     for (const page of pages) await checkPage(page);
@@ -108,7 +110,13 @@
     }
 
     try {
-      const api = await fetchText(`${String(C.apiBase||'').replace(/\/+$/,'')}/health?step=WANGAN-BIZ-6-RELEASE-CHECK`);
+      const estimate = await fetchText(new URL('estimate.js', root));
+      const cleanSource = /sourcePage:[\s\S]{0,180}location\.pathname/.test(estimate.text) && /showPublicEnvironmentBadge/.test(estimate.text);
+      add('WEB受付運用情報', estimate.ok && cleanSource ? 'ok' : 'ng', estimate.ok && cleanSource ? '検査用URL除外・環境バッジ制御あり' : 'estimate.jsのBIZ7処理を確認してください');
+    } catch (error) { add('WEB受付運用情報','ng',error.message); }
+
+    try {
+      const api = await fetchText(`${String(C.apiBase||'').replace(/\/+$/,'')}/health?step=WANGAN-BIZ-7-RELEASE-CHECK`);
       const data = JSON.parse(api.text || '{}');
       if (api.ok && data.ok === true && data.status === 'healthy') {
         add('DPRO Website API','ok',`${data.version || ''} / DB ${data.databaseVersion || ''}`);
