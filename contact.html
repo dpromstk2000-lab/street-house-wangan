@@ -92,8 +92,8 @@
       <div class="section-head"><div><p class="eyebrow">HOW IT WORKS</p><h2>DPROへそのまま登録されます。</h2></div><p>ホームページだけ別管理にせず、店舗の管理画面・営業日・予約枠と同じ情報を使用します。</p></div>
       <div class="flow-grid biz5-flow-grid">
         <article><span>STEP 01</span><h3>受付方法を選択</h3><p>即時予約、仮予約、写真相談から選びます。</p></article>
-        <article><span>STEP 02</span><h3>車両情報を入力</h3><p>分かる範囲で車種や症状を入力します。</p></article>
-        <article><span>STEP 03</span><h3>日時・写真を指定</h3><p>予約は空き時間を選択。相談は写真を追加できます。</p></article>
+        <article><span>STEP 02</span><h3>日時・内容を選択</h3><p>予約は空き時間を先に選択。相談は写真や内容を入力します。</p></article>
+        <article><span>STEP 03</span><h3>お客様・車両情報を入力</h3><p>お名前・電話番号と、分かる範囲の車両情報を入力します。</p></article>
         <article><span>STEP 04</span><h3>DPROへ登録</h3><p>店舗管理画面へ受付内容が追加されます。</p></article>
       </div>
     </div>
@@ -109,15 +109,15 @@
     <header class="modal-head">
       <p class="mini">DPRO ONLINE RECEPTION</p>
       <h2 id="estimateTitle">WEB受付</h2>
-      <p id="estimateLead">受付方法とサービスを選択してください。</p>
+      <p id="estimateLead">サービスを選び、次に空き日時を確認してください。</p>
       <div class="api-status checking" id="apiStatus"><i></i><span id="apiStatusText">DPRO接続確認中</span><span class="environment-chip" id="environmentChip">DEMO</span></div>
       <button class="modal-close" type="button" data-close-modal aria-label="閉じる">×</button>
     </header>
 
     <div class="stepper biz5-stepper" aria-label="入力の進行状況">
       <div class="stepper-item active" data-step-indicator="1"><span class="step-number">1</span><span>受付・サービス</span></div>
-      <div class="stepper-item" data-step-indicator="2"><span class="step-number">2</span><span>お客様・車両</span></div>
-      <div class="stepper-item" data-step-indicator="3"><span class="step-number">3</span><span>日時・写真</span></div>
+      <div class="stepper-item" data-step-indicator="2"><span class="step-number">2</span><span>日時・内容</span></div>
+      <div class="stepper-item" data-step-indicator="3"><span class="step-number">3</span><span>お客様・車両</span></div>
       <div class="stepper-item" data-step-indicator="4"><span class="step-number">4</span><span>確認・送信</span></div>
     </div>
 
@@ -132,24 +132,6 @@
         </section>
 
         <section class="step-panel" data-step-panel="2">
-          <div class="panel-title"><div><h3>お客様・車両情報</h3><p>お名前と電話番号は必須です。車両情報は分かる範囲で入力してください。</p></div></div>
-          <div class="form-grid">
-            <div class="field"><label for="customerName">お名前 <b class="req">必須</b></label><input id="customerName" name="customerName" autocomplete="name" required></div>
-            <div class="field"><label for="phone">電話番号 <b class="req">必須</b></label><input id="phone" name="phone" autocomplete="tel" inputmode="tel" placeholder="例：090-1234-5678" required></div>
-            <div class="field"><label for="email">メールアドレス</label><input id="email" name="email" autocomplete="email" type="email" placeholder="例：sample@example.com"></div>
-            <div class="field"><label for="contactMethod">希望する連絡方法</label><select id="contactMethod" name="contactMethod"><option>電話</option><option>メール</option><option>どちらでもよい</option></select></div>
-            <div class="field"><label for="carMaker">メーカー</label><input id="carMaker" name="carMaker" placeholder="例：トヨタ"></div>
-            <div class="field"><label for="carModel">車種</label><input id="carModel" name="carModel" placeholder="例：86"></div>
-            <div class="field"><label for="carYear">年式</label><input id="carYear" name="carYear" placeholder="例：2020年"></div>
-            <div class="field"><label for="plateLast4">ナンバー下4桁</label><input id="plateLast4" name="plateLast4" inputmode="numeric" maxlength="4" placeholder="例：1234"></div>
-            <div class="field"><label for="mileageKm">走行距離</label><input id="mileageKm" name="mileageKm" inputmode="numeric" placeholder="例：65000"><small>km単位。おおよそでも構いません。</small></div>
-            <div class="field"><label for="shakenYear">車検満了年</label><select id="shakenYear" name="shakenYear"><option value="">未入力</option></select></div>
-            <div class="field"><label for="shakenMonth">車検満了月</label><select id="shakenMonth" name="shakenMonth"><option value="">未入力</option><option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option><option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option><option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option></select></div>
-          </div>
-          <div class="form-error" data-step-error="2">お名前と電話番号を確認してください。</div>
-        </section>
-
-        <section class="step-panel" data-step-panel="3">
           <div class="panel-title"><div><h3 id="step3Title">日時・相談内容</h3><p id="step3Lead">サービスに合わせて必要な内容を入力します。</p></div></div>
           <div class="biz5-reservation-fields" id="reservationFields">
             <div class="form-grid">
@@ -167,7 +149,25 @@
             <div class="field full"><label for="message">症状・ご希望・作業内容 <b class="req">必須</b></label><textarea id="message" name="message" required placeholder="いつから、どのような症状があるか／希望する作業内容などをご入力ください。"></textarea></div>
           </div>
           <label class="form-check"><input id="privacyAgree" name="privacyAgree" type="checkbox" required><span>入力内容と写真を、予約・見積もり・相談対応のために利用することに同意します。 <a class="text-link" href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a></span></label>
-          <div class="form-error" data-step-error="3">日時、相談内容、同意欄を確認してください。</div>
+          <div class="form-error" data-step-error="2">日時、相談内容、同意欄を確認してください。</div>
+        </section>
+
+        <section class="step-panel" data-step-panel="3">
+          <div class="panel-title"><div><h3>お客様・車両情報</h3><p>お名前と電話番号は必須です。車両情報は分かる範囲で入力してください。</p></div></div>
+          <div class="form-grid">
+            <div class="field"><label for="customerName">お名前 <b class="req">必須</b></label><input id="customerName" name="customerName" autocomplete="name" required></div>
+            <div class="field"><label for="phone">電話番号 <b class="req">必須</b></label><input id="phone" name="phone" autocomplete="tel" inputmode="tel" placeholder="例：090-1234-5678" required></div>
+            <div class="field"><label for="email">メールアドレス</label><input id="email" name="email" autocomplete="email" type="email" placeholder="例：sample@example.com"></div>
+            <div class="field"><label for="contactMethod">希望する連絡方法</label><select id="contactMethod" name="contactMethod"><option>電話</option><option>メール</option><option>どちらでもよい</option></select></div>
+            <div class="field"><label for="carMaker">メーカー</label><input id="carMaker" name="carMaker" placeholder="例：トヨタ"></div>
+            <div class="field"><label for="carModel">車種</label><input id="carModel" name="carModel" placeholder="例：86"></div>
+            <div class="field"><label for="carYear">年式</label><input id="carYear" name="carYear" placeholder="例：2020年"></div>
+            <div class="field"><label for="plateLast4">ナンバー下4桁</label><input id="plateLast4" name="plateLast4" inputmode="numeric" maxlength="4" placeholder="例：1234"></div>
+            <div class="field"><label for="mileageKm">走行距離</label><input id="mileageKm" name="mileageKm" inputmode="numeric" placeholder="例：65000"><small>km単位。おおよそでも構いません。</small></div>
+            <div class="field"><label for="shakenYear">車検満了年</label><select id="shakenYear" name="shakenYear"><option value="">未入力</option></select></div>
+            <div class="field"><label for="shakenMonth">車検満了月</label><select id="shakenMonth" name="shakenMonth"><option value="">未入力</option><option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option><option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option><option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option></select></div>
+          </div>
+          <div class="form-error" data-step-error="3">お名前と電話番号を確認してください。</div>
         </section>
 
         <section class="step-panel" data-step-panel="4">

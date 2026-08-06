@@ -151,7 +151,7 @@
         const status = $(`[data-mode-status="${mode}"]`);
         if (status) status.textContent = '時間を置いて再読み込みするか、電話でお問い合わせください。';
       });
-      console.warn('WANGAN-BIZ-5 bootstrap failed', error);
+      console.warn('WANGAN-BIZ-5-R3 bootstrap failed', error);
     }
   };
 
@@ -201,7 +201,9 @@
     els.reservationDate.required = reservation;
     els.reservationTime.required = reservation;
     els.step3Title.textContent = reservation ? '予約日時・作業内容' : '写真・相談内容';
-    els.step3Lead.textContent = reservation ? 'DPROの空き時間を選択してください。' : '写真は最大5枚まで追加できます。写真なしでも送信できます。';
+    els.step3Lead.textContent = reservation ? 'DPROの空き時間を先に選択してください。' : '写真と相談内容を先に入力してください。写真なしでも送信できます。';
+    const step2Label = $('[data-step-indicator="2"] span:last-child');
+    if (step2Label) step2Label.textContent = reservation ? '日時・内容' : '写真・相談';
     applyDateLimits();
   };
 
@@ -294,6 +296,7 @@
   const formData = () => Object.fromEntries(new FormData(els.form).entries());
 
   const validateStep = step => {
+    $$('[aria-invalid="true"]').forEach(field => field.removeAttribute('aria-invalid'));
     const panel = $(`[data-step-panel="${step}"]`);
     const error = $(`[data-step-error="${step}"]`);
     let valid = true;
@@ -302,6 +305,15 @@
       valid = Boolean(service?.availableForWebsite && service.bookingMode === currentMode);
       els.service.setAttribute('aria-invalid', String(!valid));
     } else if (step === 2) {
+      const message = $('#message');
+      const privacy = $('#privacyAgree');
+      if (!message.value.trim()) { message.setAttribute('aria-invalid', 'true'); valid = false; }
+      if (!privacy.checked) { privacy.setAttribute('aria-invalid', 'true'); valid = false; }
+      if (currentMode !== 'inquiry') {
+        if (!els.reservationDate.value) { els.reservationDate.setAttribute('aria-invalid', 'true'); valid = false; }
+        if (!els.reservationTime.value) { els.reservationTime.setAttribute('aria-invalid', 'true'); valid = false; }
+      }
+    } else if (step === 3) {
       ['customerName', 'phone'].forEach(id => {
         const field = $(`#${id}`);
         const okay = field.checkValidity();
@@ -312,15 +324,6 @@
       if (!/^0\d{9,10}$/.test(digits)) {
         $('#phone').setAttribute('aria-invalid', 'true');
         valid = false;
-      }
-    } else if (step === 3) {
-      const message = $('#message');
-      const privacy = $('#privacyAgree');
-      if (!message.value.trim()) { message.setAttribute('aria-invalid', 'true'); valid = false; }
-      if (!privacy.checked) { privacy.setAttribute('aria-invalid', 'true'); valid = false; }
-      if (currentMode !== 'inquiry') {
-        if (!els.reservationDate.value) { els.reservationDate.setAttribute('aria-invalid', 'true'); valid = false; }
-        if (!els.reservationTime.value) { els.reservationTime.setAttribute('aria-invalid', 'true'); valid = false; }
       }
     }
     error?.classList.toggle('show', !valid);
@@ -625,6 +628,8 @@
     els.uploadStatus.className = 'biz5-upload-status'; els.uploadStatus.textContent = '';
     storageRemove(DRAFT_KEY); resetRequestId();
     completed = false; completionData = null; resetResult();
+    els.send.disabled = false;
+    els.send.textContent = 'DPROへ送信';
     fillServiceOptions(currentMode);
     showStep(1, false);
     els.draftStatus.textContent = '新しい受付を入力できます';
