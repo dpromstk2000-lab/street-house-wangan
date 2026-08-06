@@ -1353,3 +1353,82 @@ body.modal-lock{overflow:hidden}
   font-size:12px;
   line-height:1.75;
 }
+
+/* ========================================================================== 
+   STEP WANGAN-BIZ-5: WEB予約・仮予約・写真相談
+   ========================================================================== */
+.biz5-entry-section{position:relative;overflow:hidden}
+.biz5-entry-section:before{content:"";position:absolute;inset:auto -15% -35% auto;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(242,197,21,.12),transparent 68%);pointer-events:none}
+.biz5-mode-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;position:relative;z-index:1}
+.biz5-mode-card{position:relative;display:flex;flex-direction:column;min-height:430px;padding:30px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(145deg,#111820,#080c10);box-shadow:0 20px 60px rgba(0,0,0,.22);transition:.25s ease}
+.biz5-mode-card.is-available:hover{transform:translateY(-4px);border-color:rgba(242,197,21,.58);box-shadow:0 28px 70px rgba(0,0,0,.34)}
+.biz5-mode-card.is-stopped{opacity:.68}
+.biz5-mode-number{position:absolute;right:24px;top:18px;font-size:54px;font-weight:900;color:rgba(255,255,255,.035);letter-spacing:-.08em}
+.biz5-mode-badge{display:inline-flex;align-items:center;align-self:flex-start;min-height:26px;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:900;letter-spacing:.08em;color:#06100b;background:#9ef0bd}
+.biz5-mode-badge.provisional{color:#1a1300;background:#f4d573}
+.biz5-mode-badge.inquiry{color:#07111d;background:#9bc8ff}
+.biz5-mode-card h3{margin:24px 0 10px;font-size:25px;color:#fff}
+.biz5-mode-card p{margin:0;color:#bac4ce;line-height:1.85}
+.biz5-mode-card ul{display:grid;gap:9px;margin:24px 0 26px;padding:0;list-style:none;color:#e4e9ed;font-size:13px}
+.biz5-mode-card li:before{content:"✓";color:var(--yellow);font-weight:900;margin-right:8px}
+.biz5-mode-card .btn{margin-top:auto;width:100%}
+.biz5-mode-card .btn:disabled{cursor:not-allowed;background:#29323b;color:#8b98a4;box-shadow:none;border-color:#35404b}
+.biz5-mode-status{display:block;margin-top:12px;color:#8794a0;line-height:1.5}
+.biz5-mode-card.is-available .biz5-mode-status{color:#a9daba}
+.biz5-phone-strip{display:flex;align-items:center;justify-content:space-between;gap:22px;margin-top:22px;padding:20px 24px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.035)}
+.biz5-phone-strip div{display:grid;gap:5px}.biz5-phone-strip b{color:#fff}.biz5-phone-strip span{color:#aab5bf;font-size:13px}
+.biz5-flow-grid{grid-template-columns:repeat(4,1fr)}
+.biz5-modal .modal-panel{max-width:1040px}
+.biz5-modal .modal-head{padding-bottom:22px}
+.biz5-stepper{grid-template-columns:repeat(4,1fr)}
+.biz5-selected-mode{display:flex;align-items:center;gap:15px;margin-bottom:20px;padding:18px 20px;background:#0d141b;border-left:4px solid var(--yellow);color:#fff}
+.biz5-selected-mode>div{display:grid;gap:4px}.biz5-selected-mode b{font-size:18px}.biz5-selected-mode span:not(.biz5-mode-badge){font-size:12px;color:#aab5bf}
+.biz5-service-detail{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px;padding:18px;background:#f2f5f7;border:1px solid #dfe5e9}
+.biz5-service-detail>div{display:grid;gap:4px;padding:12px;background:#fff;border:1px solid #e5eaed}
+.biz5-service-detail span{font-size:11px;color:#6c7780;font-weight:800}.biz5-service-detail b{font-size:15px;color:#111820}
+.biz5-service-detail p{grid-column:1/-1;margin:2px 0 0;color:#59656e;line-height:1.7;font-size:13px}
+.biz5-inquiry-fields[hidden],.biz5-reservation-fields[hidden]{display:none!important}
+.biz5-photo-field{margin-top:8px}
+.biz5-photo-list{display:grid;gap:10px;margin-top:14px}
+.biz5-photo-empty{padding:18px;border:1px dashed #cbd3d9;background:#f7f9fa;color:#7a8790;text-align:center;font-size:13px}
+.biz5-photo-item{display:grid;grid-template-columns:76px 1fr auto;align-items:center;gap:14px;padding:10px;border:1px solid #dfe5e9;background:#fff}
+.biz5-photo-item img{width:76px;height:62px;object-fit:cover;background:#e8edf0}
+.biz5-photo-item>div{display:grid;gap:3px;min-width:0}.biz5-photo-item b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#111820}.biz5-photo-item span{font-size:11px;color:#7c8790}
+.biz5-photo-item em{font-style:normal;font-size:11px;font-weight:800;color:#7c8790}.biz5-photo-item em.uploading{color:#9a7200}.biz5-photo-item em.uploaded{color:#08763b}.biz5-photo-item em.error{color:#b72424}
+.biz5-photo-item button{border:0;background:#eef2f4;color:#3f4a52;padding:8px 10px;cursor:pointer}.biz5-photo-item button:hover{background:#dfe5e9}.biz5-photo-item button:disabled{opacity:.5}
+.biz5-upload-status{display:none;margin-top:12px;padding:11px 13px;font-size:12px;font-weight:700;background:#eef3f7;color:#47545e}
+.biz5-upload-status.show{display:block}.biz5-upload-status.success{background:#e5f7ec;color:#086b36}.biz5-upload-status.error{background:#fdeaea;color:#a91e1e}
+.biz5-modal .api-result.failure{border-color:#e7b8b8;background:#fff4f4}.biz5-modal .api-result.failure h4{color:#9e2020}
+.biz5-modal .completion-flow{grid-template-columns:repeat(3,1fr)}
+.biz5-modal .completion-flow>div{display:grid;gap:7px}
+.biz5-modal .completion-flow b{font-size:13px}.biz5-modal .completion-flow span{font-size:12px;line-height:1.65}
+.biz5-modal .field input[type=file]{padding:13px;background:#fff;border:1px dashed #aeb9c1}
+.biz5-modal .form-check a{color:#7d6100;text-decoration:underline;font-weight:800}
+.biz5-modal [aria-invalid="true"]{border-color:#d32f2f!important;box-shadow:0 0 0 2px rgba(211,47,47,.12)}
+@media(max-width:900px){
+  .biz5-mode-grid{grid-template-columns:1fr}.biz5-mode-card{min-height:auto}
+  .biz5-flow-grid{grid-template-columns:repeat(2,1fr)}
+  .biz5-stepper{grid-template-columns:repeat(4,minmax(74px,1fr));overflow-x:auto}
+  .biz5-stepper .stepper-item span:last-child{font-size:10px}
+  .biz5-service-detail{grid-template-columns:1fr}
+  .biz5-service-detail p{grid-column:auto}
+}
+@media(max-width:600px){
+  .biz5-mode-card{padding:24px 20px}
+  .biz5-phone-strip{align-items:stretch;flex-direction:column}.biz5-phone-strip .btn{width:100%}
+  .biz5-flow-grid{grid-template-columns:1fr}
+  .biz5-modal .modal-panel{width:100%;height:100%;max-height:none;border-radius:0}
+  .biz5-stepper{padding-inline:12px}
+  .biz5-selected-mode{align-items:flex-start;flex-direction:column}
+  .biz5-photo-item{grid-template-columns:64px 1fr}.biz5-photo-item img{width:64px;height:56px}.biz5-photo-item button{grid-column:1/-1;width:100%}
+}
+/* WANGAN-BIZ-5-R1 modal anchoring and flow layout */
+.biz5-modal{position:fixed!important;inset:0!important;top:0!important;left:0!important;right:0!important;height:100dvh!important;padding:20px}
+.biz5-modal .modal-backdrop{position:fixed}
+.biz5-flow-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.biz5-flow-grid article{min-height:190px;padding:24px 20px;background:#fff;border:1px solid #dde3e7;box-shadow:0 12px 28px rgba(16,22,28,.06)}
+.biz5-flow-grid article span{display:block;margin-bottom:22px;color:#9b7900;font-size:10px;font-weight:1000;letter-spacing:.14em}
+.biz5-flow-grid article h3{margin:0 0 10px;color:#151a1f;font-size:18px}
+.biz5-flow-grid article p{margin:0;color:#65717a;font-size:12px;line-height:1.8}
+@media(max-width:900px){.biz5-flow-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.biz5-modal{padding:0}.biz5-flow-grid{grid-template-columns:1fr}.biz5-flow-grid article{min-height:auto}}
