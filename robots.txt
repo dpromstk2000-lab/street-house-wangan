@@ -1,3 +1,3 @@
-# WANGAN-BIZ-8-R1 / 契約前・検索非公開
+# WANGAN-BIZ-8-R2 / 契約前・検索非公開
 User-agent: *
 Disallow: /street-house-wangan/

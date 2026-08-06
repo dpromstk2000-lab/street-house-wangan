@@ -1,11 +1,12 @@
 <!DOCTYPE html>
+
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="robots" content="noindex,nofollow">
-  <title>WANGAN-BIZ-8-R1 RELEASE CHECK</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="noindex,nofollow" name="robots"/>
+<title>WANGAN-BIZ-8-R2 RELEASE CHECK</title>
+<style>
     :root{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;color:#e8edf2;background:#0b1117}
     *{box-sizing:border-box}body{margin:0;padding:30px}.wrap{max-width:1180px;margin:auto}
     h1{font-size:clamp(28px,5vw,54px);margin:8px 0}.lead{color:#aeb8c3;line-height:1.7}
@@ -19,35 +20,40 @@
     code{white-space:pre-wrap;word-break:break-all;color:#cbd5e1}.links{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
     @media(max-width:760px){body{padding:18px}.summary{grid-template-columns:repeat(2,1fr)}.table-wrap{overflow:auto}}
   </style>
-  <script src="config.js?v=WANGAN-BIZ-8-R1"></script>
-</head>
+<script src="config.js?v=WANGAN-BIZ-8-R2"></script>
+<link href="integration.css?v=WANGAN-BIZ-8-R2" rel="stylesheet"/></head>
 <body>
 <div class="wrap">
-  <small>INTERNAL RELEASE CHECK / OWNER非公開</small>
-  <h1>WANGAN-BIZ-8-R1</h1>
-  <p class="lead">契約前の提案状態、検索非公開、店舗情報、料金設定、公開ページ、DPRO APIを一括確認します。</p>
-  <div class="links">
-    <button id="run">一括検査を実行</button>
-    <a class="btn" href="index.html">公開サイトへ</a>
-    <a class="btn" href="https://dpromstk2000-lab.github.io/line-shaken-liff/dashboard.html?ver=WANGAN-BIZ-8-R1">DPRO管理画面へ</a>
-  </div>
-  <div class="summary">
-    <div class="sum">合格<b id="okCount" class="ok">0</b></div>
-    <div class="sum">注意<b id="warnCount" class="warn">0</b></div>
-    <div class="sum">不合格<b id="ngCount" class="ng">0</b></div>
-    <div class="sum">検査数<b id="totalCount">0</b></div>
-  </div>
-  <section class="panel">
-    <h2>検査結果</h2>
-    <div class="table-wrap"><table><thead><tr><th>対象</th><th>判定</th><th>内容</th></tr></thead><tbody id="results"></tbody></table></div>
-  </section>
+<small>INTERNAL RELEASE CHECK / OWNER非公開</small>
+<h1>WANGAN-BIZ-8-R2</h1>
+<p class="lead">契約前の提案状態、検索非公開、LINE公式・DPRO統合訴求、店舗情報、料金設定、公開ページ、DPRO APIを一括確認します。</p>
+<div class="links">
+<button id="run">一括検査を実行</button>
+<a class="btn" href="index.html">公開サイトへ</a>
+<a class="btn" href="https://dpromstk2000-lab.github.io/line-shaken-liff/dashboard.html?ver=WANGAN-BIZ-8-R2">DPRO管理画面へ</a>
+</div>
+<div class="summary">
+<div class="sum">合格<b class="ok" id="okCount">0</b></div>
+<div class="sum">注意<b class="warn" id="warnCount">0</b></div>
+<div class="sum">不合格<b class="ng" id="ngCount">0</b></div>
+<div class="sum">検査数<b id="totalCount">0</b></div>
+</div>
+<section class="panel">
+<h2>検査結果</h2>
+<div class="table-wrap"><table><thead><tr><th>対象</th><th>判定</th><th>内容</th></tr></thead><tbody id="results"></tbody></table></div>
+</section>
 </div>
 <script>
 (() => {
   const C = window.DPRO_SITE_CONFIG || {};
   const root = String(C.siteBaseUrl || new URL('./', location.href)).replace(/\/?$/, '/');
   const rows = [];
-  const add = (target, status, message) => rows.push({target,status,message});
+  const add = (target, status, message) => {
+    const key = `${target}__${message}`;
+    if (rows.some(row => `${row.target}__${row.message}` === key)) return;
+    rows.push({target,status,message});
+  };
+  let running = false;
   const escapeHtml = v => String(v ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 
   async function fetchText(url, timeout=15000) {
@@ -97,13 +103,24 @@
   }
 
   async function run() {
+    if (running) return;
+    running = true;
+    const runButton = document.getElementById('run');
+    if (runButton) {
+      runButton.disabled = true;
+      runButton.textContent = '検査中...';
+    }
     rows.length = 0;
     document.getElementById('results').innerHTML = '<tr><td colspan="3">検査中...</td></tr>';
 
-    add('config.version', /^WANGAN-BIZ-8-R1/.test(C.version || '') ? 'ok' : 'ng', C.version || '未設定');
+    add('config.version', /^WANGAN-BIZ-8-R2/.test(C.version || '') ? 'ok' : 'ng', C.version || '未設定');
     add('契約前提案モード', C.environment === 'staging' && C.releaseStage === 'proposal' && C.contractStatus === 'not_contracted' ? 'ok' : 'ng', `${C.environment || '未設定'} / ${C.releaseStage || '未設定'} / ${C.contractStatus || '未設定'}`);
     add('検索・登録停止', C.searchIndexEnabled === false && C.goLiveApproved === false && C.searchEngineRegistrationEnabled === false && C.sitemapSubmissionEnabled === false ? 'ok' : 'ng', C.searchIndexEnabled ? '検索公開ONです' : 'noindex・検索登録OFF・サイトマップ送信OFF');
-    add('LINE公式URL', C.defaultLineUrl ? 'ok' : 'warn', C.defaultLineUrl || '未設定のためLINE導線は非表示');
+    add('LINE公式連携設定',
+      C.lineIntegrationEnabled === true && C.lineIntegrationMode === 'proposal' ? 'ok' : 'ng',
+      C.defaultLineUrl
+        ? `LINE公式URL設定済み：${C.defaultLineUrl}`
+        : '契約前は連携対応を表示し、URL設定後に相談ボタンへ自動切替');
     add('公開環境表示', C.showPublicEnvironmentBadge === false ? 'ok' : 'warn', C.showPublicEnvironmentBadge === false ? 'お客様画面の環境バッジは非表示' : '環境バッジが公開表示されます');
     add('受付URL整理', C.stripTrackingFromOperationalRecords === true ? 'ok' : 'warn', C.stripTrackingFromOperationalRecords === true ? '運用記録から検査用クエリを除外' : '受付ページURLへクエリが残ります');
     add('店舗営業時間', C.openingHoursLabel === '月・火・水・金・土 9:00〜19:00／日曜・祝日 9:00〜18:00' && C.regularHolidayLabel === '木曜日' ? 'ok' : 'ng', `${C.openingHoursLabel || '未設定'} / ${C.regularHolidayLabel || '未設定'}定休`);
@@ -115,7 +132,7 @@
     const pages = C.publicPages || ['index.html','services.html','maintenance.html','custom.html','pricing.html','works.html','about.html','contact.html','privacy.html'];
     for (const page of pages) await checkPage(page);
 
-    for (const asset of ['site.css','config.js','site.js','dpro-site.js','estimate.js','ogp.jpg','robots.txt','sitemap.xml','404.html']) {
+    for (const asset of ['site.css','integration.css','config.js','site.js','dpro-site.js','estimate.js','ogp.jpg','robots.txt','sitemap.xml','404.html']) {
       await checkAsset(asset, asset !== 'estimate.js' || pages.includes('contact.html'));
     }
 
@@ -132,8 +149,27 @@
     }
 
     try {
+      const [indexPage, contactPage, pricingPage, privacyPage] = await Promise.all([
+        fetchText(new URL('index.html', root)),
+        fetchText(new URL('contact.html', root)),
+        fetchText(new URL('pricing.html', root)),
+        fetchText(new URL('privacy.html', root))
+      ]);
+      const indexOk = /data-dpro-integration/.test(indexPage.text) && /WEBSITE × LINE OFFICIAL × DPRO/.test(indexPage.text);
+      const contactOk = /data-dpro-unified-reception/.test(contactPage.text) && /WEBでもLINEでも/.test(contactPage.text);
+      const pricingOk = /data-dpro-line-flow/.test(pricingPage.text) && /完了・次回案内/.test(pricingPage.text);
+      const privacyOk = /LINE公式アカウント連携/.test(privacyPage.text);
+      add('トップ統合訴求', indexPage.ok && indexOk ? 'ok' : 'ng', indexOk ? 'WEB・LINE公式・DPROの統合セクションあり' : '統合セクションを確認してください');
+      add('WEB受付統合説明', contactPage.ok && contactOk ? 'ok' : 'ng', contactOk ? 'WEB・LINE・電話の一元管理説明あり' : '統合受付説明を確認してください');
+      add('LINE継続フォロー', pricingPage.ok && pricingOk ? 'ok' : 'ng', pricingOk ? '完了連絡・次回案内の運用フローあり' : '利用フローを確認してください');
+      add('LINE個人情報説明', privacyPage.ok && privacyOk ? 'ok' : 'ng', privacyOk ? '導入後のLINE情報取扱いを記載' : 'プライバシーポリシーを確認してください');
+    } catch (error) {
+      add('LINE・DPRO統合訴求','ng',error.message);
+    }
+
+    try {
       const estimate = await fetchText(new URL('estimate.js', root));
-      const cleanSource = /sourcePage:[\s\S]{0,180}location\.pathname/.test(estimate.text) && /showPublicEnvironmentBadge/.test(estimate.text) && /wanganBiz8R1Draft/.test(estimate.text);
+      const cleanSource = /sourcePage:[\s\S]{0,180}location\.pathname/.test(estimate.text) && /showPublicEnvironmentBadge/.test(estimate.text) && /wanganBiz8R2Draft/.test(estimate.text);
       add('WEB受付運用情報', estimate.ok && cleanSource ? 'ok' : 'ng', estimate.ok && cleanSource ? 'BIZ-8-R1入力保存・検査用URL除外・環境バッジ制御あり' : 'estimate.jsのBIZ-8処理を確認してください');
     } catch (error) { add('WEB受付運用情報','ng',error.message); }
 
@@ -150,7 +186,7 @@
     }
 
     try {
-      const api = await fetchText(`${String(C.apiBase||'').replace(/\/+$/,'')}/health?step=WANGAN-BIZ-8-R1-RELEASE-CHECK`);
+      const api = await fetchText(`${String(C.apiBase||'').replace(/\/+$/,'')}/health?step=WANGAN-BIZ-8-R2-RELEASE-CHECK`);
       const data = JSON.parse(api.text || '{}');
       if (api.ok && data.ok === true && data.status === 'healthy') {
         const switches = data.switches || {};
@@ -165,6 +201,11 @@
     document.getElementById('warnCount').textContent = counts.warn;
     document.getElementById('ngCount').textContent = counts.ng;
     document.getElementById('totalCount').textContent = rows.length;
+    running = false;
+    if (runButton) {
+      runButton.disabled = false;
+      runButton.textContent = '一括検査を実行';
+    }
     document.getElementById('results').innerHTML = rows.map(row =>
       `<tr><td><code>${escapeHtml(row.target)}</code></td><td><span class="badge ${row.status}">${row.status==='ok'?'合格':row.status==='warn'?'注意':'不合格'}</span></td><td>${escapeHtml(row.message)}</td></tr>`
     ).join('');

@@ -1,13 +1,13 @@
 /**
  * STREET HOUSE WANGAN Website Public Config
- * STEP WANGAN-BIZ-8-R1
+ * STEP WANGAN-BIZ-8-R2
  *
  * 契約前の提案確認用サイトです。
  * 検索エンジン登録・サイトマップ送信・正式公開は行いません。
  * Supabaseキー、Service Role、管理コード、秘密情報は置きません。
  */
 window.DPRO_SITE_CONFIG = Object.freeze({
-  version: 'WANGAN-BIZ-8-R1-SITE-20260806',
+  version: 'WANGAN-BIZ-8-R2-SITE-20260806',
   environment: 'staging',
   releaseStage: 'proposal',
   contractStatus: 'not_contracted',
@@ -46,6 +46,12 @@ window.DPRO_SITE_CONFIG = Object.freeze({
   regularHolidayLabel: '木曜日',
   emergencyHoursLabel: '',
 
+  lineIntegrationEnabled: true,
+  lineIntegrationMode: 'proposal',
+  lineOfficialAccountConfigured: false,
+  linePendingLabel: 'LINE公式連携対応',
+  linePendingNote: '契約・設定後に開通',
+  lineConnectedLabel: 'LINEで相談',
   defaultLineUrl: '',
   defaultMapUrl: 'https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E5%88%86%E7%9C%8C%E6%9D%B5%E7%AF%89%E5%B8%82%E5%A4%A7%E5%AD%97%E5%AE%88%E6%B1%9F1291-3',
 
@@ -63,5 +69,5 @@ window.DPRO_SITE_CONFIG = Object.freeze({
 
   cacheMinutes: 5,
   source: 'WEB',
-  sourceDetail: 'street-house-wangan-business-proposal'
+  sourceDetail: 'street-house-wangan-line-dpro-integration-proposal'
 });

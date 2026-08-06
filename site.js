@@ -58,18 +58,7 @@
       }
     });
 
-    document.querySelectorAll('[data-dpro-line]').forEach(el => {
-      const lineUrl = String(runtime.lineUrl || CONFIG.defaultLineUrl || '');
-      if (lineUrl) {
-        el.href = lineUrl;
-        el.hidden = false;
-        el.classList.remove('is-disabled');
-      } else {
-        el.removeAttribute('href');
-        el.hidden = true;
-        el.classList.add('is-disabled');
-      }
-    });
+    applyLineIntegration(runtime);
 
     document.querySelectorAll('[data-dpro-map]').forEach(el => {
       const mapUrl = String(runtime.mapUrl || CONFIG.defaultMapUrl || '');
@@ -91,6 +80,103 @@
       if (!dd) return;
       if (label === '営業時間' && openingHours) dd.textContent = openingHours;
       if (label === '定休日' && regularHoliday) dd.textContent = regularHoliday;
+    });
+  }
+
+  function validPublicUrl(value) {
+    try {
+      const url = new URL(String(value || ''), location.href);
+      return /^https?:$/.test(url.protocol) ? url.href : '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function ensureLineToast() {
+    let toast = document.getElementById('lineIntegrationToast');
+    if (toast) return toast;
+    toast = document.createElement('div');
+    toast.id = 'lineIntegrationToast';
+    toast.className = 'line-integration-toast';
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
+    toast.innerHTML = '<b>LINE公式連携対応</b><br>契約後に店舗のLINE公式URLを設定すると、このボタンからLINE相談を開始できます。';
+    document.body.appendChild(toast);
+    return toast;
+  }
+
+  let lineToastTimer = 0;
+  function showLinePendingNotice() {
+    const toast = ensureLineToast();
+    clearTimeout(lineToastTimer);
+    toast.classList.add('show');
+    lineToastTimer = window.setTimeout(() => toast.classList.remove('show'), 3600);
+  }
+
+  function applyLineIntegration(runtime = window.DPRO_RUNTIME || {}) {
+    const configuredUrl = validPublicUrl(runtime.lineUrl || CONFIG.defaultLineUrl || '');
+    const connected = Boolean(CONFIG.lineIntegrationEnabled !== false && configuredUrl);
+    const pendingMain = String(CONFIG.linePendingLabel || 'LINE公式連携対応');
+    const pendingSub = String(CONFIG.linePendingNote || '契約・設定後に開通');
+    const connectedMain = String(CONFIG.lineConnectedLabel || 'LINEで相談');
+
+    document.body.dataset.lineIntegration = connected ? 'connected' : 'pending';
+
+    document.querySelectorAll('[data-dpro-line]').forEach(el => {
+      el.hidden = false;
+      el.classList.toggle('is-line-connected', connected);
+      el.classList.toggle('is-line-pending', !connected);
+      el.classList.remove('is-disabled');
+
+      const main = el.querySelector('.line-main');
+      const sub = el.querySelector('.line-sub');
+      if (main) main.textContent = connected ? connectedMain : pendingMain;
+      if (sub) {
+        sub.textContent = connected ? 'LINE公式を開く' : pendingSub;
+        sub.hidden = false;
+      }
+
+      if (connected) {
+        el.href = configuredUrl;
+        el.target = '_blank';
+        el.rel = 'noopener noreferrer';
+        el.removeAttribute('aria-disabled');
+        el.title = connectedMain;
+      } else {
+        el.removeAttribute('href');
+        el.removeAttribute('target');
+        el.removeAttribute('rel');
+        el.setAttribute('aria-disabled', 'true');
+        el.setAttribute('role', 'button');
+        el.tabIndex = 0;
+        el.title = `${pendingMain}（${pendingSub}）`;
+      }
+    });
+
+    document.querySelectorAll('[data-line-integration-status]').forEach(el => {
+      el.textContent = connected
+        ? 'LINE公式への導線は開通しています。'
+        : 'LINE公式URLは契約・設定後に登録します。現在は連携機能のご案内表示です。';
+    });
+  }
+
+  function initLineIntegrationInteraction() {
+    const activate = target => {
+      if (!target?.matches?.('[data-dpro-line][aria-disabled="true"]')) return;
+      showLinePendingNotice();
+    };
+    document.addEventListener('click', event => {
+      const target = event.target.closest?.('[data-dpro-line]');
+      if (!target || target.getAttribute('aria-disabled') !== 'true') return;
+      event.preventDefault();
+      activate(target);
+    });
+    document.addEventListener('keydown', event => {
+      if (!['Enter', ' '].includes(event.key)) return;
+      const target = event.target.closest?.('[data-dpro-line]');
+      if (!target || target.getAttribute('aria-disabled') !== 'true') return;
+      event.preventDefault();
+      activate(target);
     });
   }
 
@@ -245,6 +331,7 @@
     initMenu();
     initReveal();
     initHeroVideo();
+    initLineIntegrationInteraction();
     applyAll();
 
     // DPROの動的店舗情報反映後に、共通情報と固定電話を最終整合させます。
