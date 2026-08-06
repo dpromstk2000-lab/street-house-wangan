@@ -1334,3 +1334,22 @@ body.modal-lock{overflow:hidden}
 .is-disabled{cursor:not-allowed;opacity:.62}
 @media(max-width:980px){.dpro-live-grid{grid-template-columns:1fr}.dpro-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dpro-calendar-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:650px){.dpro-global-status-inner{width:calc(100% - 28px);display:grid;grid-template-columns:auto 1fr;gap:3px 10px;padding:9px 0}.dpro-global-status-inner>a{grid-column:2;margin:2px 0 0}.dpro-global-status-inner>span:not(.dpro-status-dot){grid-column:2}.dpro-live-section{padding:52px 0}.dpro-live-panel{padding:18px}.dpro-live-panel-head{display:grid}.dpro-service-grid{grid-template-columns:1fr}.dpro-calendar-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dpro-price-row{grid-template-columns:1fr}.dpro-price-row>div:last-child{text-align:left}.dpro-contact-state{grid-template-columns:1fr;padding:21px}.dpro-contact-actions{grid-column:auto}.dpro-contact-actions .btn{width:100%}}
+
+/* =========================================================
+   STEP WANGAN-BIZ-4-R1
+   Desktop service grid / process readability refinement
+   2026-08-06
+   ========================================================= */
+@media (min-width:981px){
+  .dpro-service-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+}
+.process-step h3{
+  color:#fff;
+}
+.process-step p{
+  color:#cbd2d7;
+  font-size:12px;
+  line-height:1.75;
+}
