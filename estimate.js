@@ -1,6 +1,8 @@
 (() => {
   'use strict';
 
+  // STEP WANGAN-BIZ-5-R5: 入力内容ごとの二重送信防止キー管理
+
   const CONFIG = window.DPRO_SITE_CONFIG || {};
   const API_BASE = String(CONFIG.apiBase || 'https://dpro-wangan-biz-api.dpromstk2000.workers.dev').replace(/\/+$/, '');
   const SHOP_CODE = String(CONFIG.shopCode || 'street_house_kitsuki');
@@ -61,6 +63,7 @@
   let lastFocused = null;
   let draftTimer = null;
   let volatileRequestId = '';
+  let volatileRequestFingerprint = '';
   let submitSlowTimer = null;
 
   const storageGet = key => { try { return window.localStorage?.getItem(key) || ''; } catch (_) { return ''; } };
@@ -449,17 +452,80 @@
     return file;
   };
 
-  const requestId = () => {
-    let id = storageGet(REQUEST_KEY) || volatileRequestId;
-    if (!id) {
-      id = `wangan-biz5-${makeUuid()}`;
-      volatileRequestId = id;
-      storageSet(REQUEST_KEY, id);
+  const hashText = value => {
+    let hash = 2166136261;
+    const text = String(value || '');
+    for (let index = 0; index < text.length; index += 1) {
+      hash ^= text.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
     }
+    return (hash >>> 0).toString(16).padStart(8, '0');
+  };
+
+  const submissionFingerprint = () => {
+    const d = formData();
+    const normalized = {
+      mode: currentMode,
+      serviceCode: d.serviceCode || '',
+      reservationDate: d.reservationDate || '',
+      reservationTime: d.reservationTime || '',
+      preferredVisitDate: d.preferredVisitDate || '',
+      preferredVisitTime: d.preferredVisitTime || '',
+      customerName: String(d.customerName || '').trim(),
+      phone: String(d.phone || '').replace(/\D/g, '').replace(/^81/, '0'),
+      email: String(d.email || '').trim().toLowerCase(),
+      contactMethod: d.contactMethod || '',
+      carMaker: String(d.carMaker || '').trim(),
+      carModel: String(d.carModel || '').trim(),
+      carYear: String(d.carYear || '').trim(),
+      plateLast4: String(d.plateLast4 || '').trim(),
+      mileageKm: String(d.mileageKm || '').trim(),
+      shakenYear: String(d.shakenYear || '').trim(),
+      shakenMonth: String(d.shakenMonth || '').trim(),
+      partsInfo: String(d.partsInfo || '').trim(),
+      message: String(d.message || '').trim(),
+      files: selectedFiles.map(item => ({
+        name: item.file?.name || '',
+        size: Number(item.file?.size || 0),
+        lastModified: Number(item.file?.lastModified || 0)
+      }))
+    };
+    return hashText(JSON.stringify(normalized));
+  };
+
+  const readRequestState = () => {
+    const raw = storageGet(REQUEST_KEY);
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed.id === 'string' && typeof parsed.fingerprint === 'string') return parsed;
+    } catch (_) {}
+    // R4以前の文字列形式は別内容へ使い回されるため破棄する。
+    storageRemove(REQUEST_KEY);
+    return null;
+  };
+
+  const requestId = () => {
+    const fingerprint = submissionFingerprint();
+    const stored = readRequestState();
+    if (stored?.fingerprint === fingerprint && stored.id) {
+      volatileRequestId = stored.id;
+      volatileRequestFingerprint = fingerprint;
+      return stored.id;
+    }
+    if (volatileRequestId && volatileRequestFingerprint === fingerprint) return volatileRequestId;
+    const id = `wangan-biz5-${makeUuid()}`;
+    volatileRequestId = id;
+    volatileRequestFingerprint = fingerprint;
+    storageSet(REQUEST_KEY, JSON.stringify({ id, fingerprint, createdAt: Date.now() }));
     return id;
   };
 
-  const resetRequestId = () => { volatileRequestId = ''; storageRemove(REQUEST_KEY); };
+  const resetRequestId = () => {
+    volatileRequestId = '';
+    volatileRequestFingerprint = '';
+    storageRemove(REQUEST_KEY);
+  };
 
   const uploadPhotos = async () => {
     if (currentMode !== 'inquiry' || !selectedFiles.length) return [];
@@ -558,6 +624,7 @@
     els.completionCaution.hidden = false;
     els.completionCaution.textContent = currentMode === 'instant' ? '受付内容の変更・キャンセルは店舗へお電話ください。' : currentMode === 'provisional' ? 'この時点では正式確定ではありません。店舗からの確認連絡をお待ちください。' : '写真の確認URLは店舗管理用です。お客様の画面には公開されません。';
     storageRemove(DRAFT_KEY);
+    resetRequestId();
     showStep(4, false);
     revealResult();
     showToast(`${info.success} 受付番号を画面に表示しました。`);
@@ -616,11 +683,27 @@
       setSubmittingState(false);
       els.panel.classList.remove('completed');
       els.result.className = 'api-result show failure';
-      els.resultTitle.textContent = 'DPROへ送信できませんでした';
-      els.resultText.textContent = error.message || '通信状態を確認して再度お試しください。';
-      setApiState('failed', 'DPRO送信エラー');
+      const keyConflict = error?.code === 'IDEMPOTENCY_CONFLICT' || /同じ送信キー/.test(String(error?.message || ''));
+      if (keyConflict) {
+        resetRequestId();
+        if (currentMode === 'inquiry') {
+          selectedFiles.forEach(item => {
+            item.attachmentId = '';
+            if (item.status === 'uploaded') item.status = 'ready';
+          });
+          renderPhotos();
+        }
+        els.resultTitle.textContent = '送信情報を新しくしました';
+        els.resultText.textContent = '古い二重送信防止情報を自動で解除しました。今回の受付はまだ登録されていません。内容を確認し、「DPROへ送信」をもう一度だけ押してください。';
+        setApiState('connected', 'DPRO接続済み｜再送準備完了');
+        showToast('送信情報を更新しました。もう一度だけ送信してください。');
+      } else {
+        els.resultTitle.textContent = 'DPROへ送信できませんでした';
+        els.resultText.textContent = error.message || '通信状態を確認して再度お試しください。';
+        setApiState('failed', 'DPRO送信エラー');
+        showToast(error.message || '受付を送信できませんでした。');
+      }
       revealResult();
-      showToast(error.message || '受付を送信できませんでした。');
     } finally {
       isSubmitting = false;
       setSubmittingState(false);
