@@ -1432,3 +1432,25 @@ body.modal-lock{overflow:hidden}
 .biz5-flow-grid article p{margin:0;color:#65717a;font-size:12px;line-height:1.8}
 @media(max-width:900px){.biz5-flow-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.biz5-modal{padding:0}.biz5-flow-grid{grid-template-columns:1fr}.biz5-flow-grid article{min-height:auto}}
+
+
+/* STEP WANGAN-BIZ-5-R4: 送信中・完了状態を明確化 */
+.biz5-modal .modal-panel{position:relative}
+.biz5-submit-overlay{position:absolute;inset:0;z-index:80;display:grid;place-items:center;padding:22px;background:rgba(4,7,10,.82);backdrop-filter:blur(4px)}
+.biz5-submit-overlay[hidden]{display:none}
+.biz5-submit-overlay-card{width:min(430px,100%);padding:30px 24px;text-align:center;background:#0c1218;color:#fff;border:1px solid rgba(242,197,21,.65);box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.biz5-submit-overlay-card b{display:block;margin:16px 0 8px;font-size:21px;line-height:1.4}
+.biz5-submit-overlay-card p{margin:0;color:#dce3e8;font-size:13px;line-height:1.8}
+.biz5-submit-overlay-card small{display:block;margin-top:14px;color:#f2c515;font-weight:800}
+.biz5-submit-spinner{display:inline-block;width:46px;height:46px;border:4px solid rgba(255,255,255,.2);border-top-color:#f2c515;border-radius:50%;animation:biz5-submit-spin .8s linear infinite}
+@keyframes biz5-submit-spin{to{transform:rotate(360deg)}}
+.biz5-modal .api-result.sending{display:block;border-left:5px solid #f2c515;background:#fffbea}
+.biz5-modal .api-result.sending h4{color:#675400}
+.biz5-modal .api-result.sending::before{content:"";display:inline-block;width:14px;height:14px;margin-right:8px;border:2px solid rgba(103,84,0,.25);border-top-color:#675400;border-radius:50%;vertical-align:-2px;animation:biz5-submit-spin .8s linear infinite}
+.biz5-modal .modal-panel.completed [data-step-panel="4"]>.panel-title,
+.biz5-modal .modal-panel.completed [data-step-panel="4"]>.confirm-grid{display:none}
+.biz5-modal .modal-panel.completed .api-result{margin-top:0}
+.biz5-modal .modal-panel.is-submitting .modal-close{opacity:.35;pointer-events:none}
+.biz5-modal .modal-panel.is-submitting .modal-footer button:not(#sendEstimate),
+.biz5-modal .modal-panel.is-submitting .modal-footer a{opacity:.35;pointer-events:none}
+@media(max-width:640px){.biz5-submit-overlay{padding:12px}.biz5-submit-overlay-card{padding:26px 18px}.biz5-submit-overlay-card b{font-size:19px}}

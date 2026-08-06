@@ -17,7 +17,7 @@
   <meta property="og:image" content="https://dpromstk2000-lab.github.io/street-house-wangan/ogp.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23f2c515'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-size='29' font-family='Arial' font-weight='900' fill='%23080a0d'%3ESW%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="site.css">
+  <link rel="stylesheet" href="site.css?v=WANGAN-BIZ-5-R4">
   <script src="config.js"></script>
   <script id="localBusinessJsonLd" type="application/ld+json">{"@context":"https://schema.org","@type":"AutoRepair","name":"ストリートハウス湾岸通り","url":"https://dpromstk2000-lab.github.io/street-house-wangan/","telephone":"080-5241-0066","address":{"@type":"PostalAddress","streetAddress":"大字守江1291-3","addressLocality":"杵築市","addressRegion":"大分県","postalCode":"873-0033","addressCountry":"JP"},"priceRange":"¥¥"}</script>
 </head>
@@ -106,6 +106,15 @@
 <div class="estimate-modal biz5-modal" id="estimateModal" aria-hidden="true">
   <div class="modal-backdrop" data-close-modal></div>
   <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="estimateTitle">
+    <div class="biz5-submit-overlay" id="submitOverlay" hidden role="status" aria-live="assertive" aria-atomic="true">
+      <div class="biz5-submit-overlay-card">
+        <span class="biz5-submit-spinner" aria-hidden="true"></span>
+        <b id="submitOverlayTitle">DPROへ送信しています</b>
+        <p id="submitOverlayText">受付内容を登録しています。この画面を閉じずにお待ちください。</p>
+        <small>送信ボタンを押し直す必要はありません。</small>
+      </div>
+    </div>
+
     <header class="modal-head">
       <p class="mini">DPRO ONLINE RECEPTION</p>
       <h2 id="estimateTitle">WEB受付</h2>
@@ -194,6 +203,6 @@
   </section>
 </div>
 <div class="toast" role="status" aria-live="polite"></div>
-<script src="site.js"></script><script src="estimate.js"></script><script src="dpro-site.js"></script>
+<script src="site.js"></script><script src="estimate.js?v=WANGAN-BIZ-5-R4"></script><script src="dpro-site.js"></script>
 </body>
 </html>

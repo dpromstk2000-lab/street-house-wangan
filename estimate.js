@@ -46,7 +46,8 @@
     back: $('#backStep'), next: $('#nextStep'), send: $('#sendEstimate'), clear: $('#clearDraft'),
     result: $('#apiResult'), resultTitle: $('#apiResultTitle'), resultText: $('#apiResultText'), reference: $('#apiReference'), completionIcon: $('#completionIcon'), completionFlow: $('#completionFlow'), completionCaution: $('#completionCaution'),
     confirmReception: $('#confirmReception'), confirmCustomer: $('#confirmCustomer'), confirmRequest: $('#confirmRequest'),
-    successPhone: $('#successPhone'), receipt: $('#downloadReceipt'), newRequest: $('#newRequest'), closeSuccess: $('#closeSuccess'), toast: $('.toast')
+    successPhone: $('#successPhone'), receipt: $('#downloadReceipt'), newRequest: $('#newRequest'), closeSuccess: $('#closeSuccess'), toast: $('.toast'),
+    submitOverlay: $('#submitOverlay'), submitOverlayTitle: $('#submitOverlayTitle'), submitOverlayText: $('#submitOverlayText')
   };
 
   let bootstrap = null;
@@ -60,6 +61,7 @@
   let lastFocused = null;
   let draftTimer = null;
   let volatileRequestId = '';
+  let submitSlowTimer = null;
 
   const storageGet = key => { try { return window.localStorage?.getItem(key) || ''; } catch (_) { return ''; } };
   const storageSet = (key, value) => { try { window.localStorage?.setItem(key, value); return true; } catch (_) { return false; } };
@@ -79,6 +81,32 @@
     els.toast.classList.add('show');
     clearTimeout(showToast.timer);
     showToast.timer = setTimeout(() => els.toast.classList.remove('show'), 2800);
+  };
+
+  const nextPaint = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+  const revealResult = () => {
+    setTimeout(() => {
+      try { els.result.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) { els.scroll.scrollTop = els.scroll.scrollHeight; }
+    }, 40);
+  };
+
+  const setSubmittingState = (active, title = 'DPROへ送信しています', text = '受付内容を登録しています。この画面を閉じずにお待ちください。') => {
+    clearTimeout(submitSlowTimer);
+    submitSlowTimer = null;
+    els.form.setAttribute('aria-busy', String(Boolean(active)));
+    els.panel.classList.toggle('is-submitting', Boolean(active));
+    if (!els.submitOverlay) return;
+    els.submitOverlay.hidden = !active;
+    els.submitOverlay.classList.toggle('show', Boolean(active));
+    if (els.submitOverlayTitle) els.submitOverlayTitle.textContent = title;
+    if (els.submitOverlayText) els.submitOverlayText.textContent = text;
+    if (active) {
+      submitSlowTimer = setTimeout(() => {
+        if (!isSubmitting || !els.submitOverlayText) return;
+        els.submitOverlayText.textContent = '通信に少し時間がかかっています。二重送信を防ぐため、ボタンを押し直さずそのままお待ちください。';
+      }, 8000);
+    }
   };
 
   const fetchJson = async (url, options = {}, timeout = 20000) => {
@@ -239,6 +267,10 @@
   };
 
   const closeModal = () => {
+    if (isSubmitting) {
+      showToast('DPROへ送信中です。完了するまで画面を閉じずにお待ちください。');
+      return;
+    }
     els.modal.classList.remove('open');
     els.modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
@@ -492,6 +524,8 @@
   };
 
   const resetResult = () => {
+    setSubmittingState(false);
+    els.panel.classList.remove('completed');
     els.result.className = 'api-result';
     els.resultTitle.textContent = 'DPRO受付結果';
     els.resultText.textContent = '';
@@ -504,6 +538,8 @@
 
   const complete = result => {
     completed = true;
+    setSubmittingState(false);
+    els.panel.classList.add('completed');
     completionData = { result, mode: currentMode, service: selectedService(), values: formData(), photoCount: selectedFiles.length };
     const info = modeInfo[currentMode];
     const reference = result.reservationId || result.inquiryId || result.requestId || '';
@@ -523,25 +559,50 @@
     els.completionCaution.textContent = currentMode === 'instant' ? '受付内容の変更・キャンセルは店舗へお電話ください。' : currentMode === 'provisional' ? 'この時点では正式確定ではありません。店舗からの確認連絡をお待ちください。' : '写真の確認URLは店舗管理用です。お客様の画面には公開されません。';
     storageRemove(DRAFT_KEY);
     showStep(4, false);
-    showToast(info.success);
+    revealResult();
+    showToast(`${info.success} 受付番号を画面に表示しました。`);
   };
 
   const submit = async event => {
     event.preventDefault();
-    if (isSubmitting || completed) return;
-    if (![1, 2, 3].every(validateStep)) {
-      const invalid = [1, 2, 3].find(step => !validateStep(step));
-      showStep(invalid || 1);
+    if (isSubmitting) {
+      showToast('現在送信中です。完了するまでそのままお待ちください。');
       return;
     }
+    if (completed) {
+      showToast('この受付は送信済みです。受付番号をご確認ください。');
+      revealResult();
+      return;
+    }
+
+    const invalidStep = [1, 2, 3].find(step => !validateStep(step));
+    if (invalidStep) {
+      showStep(invalidStep);
+      showToast('未入力または確認が必要な項目があります。赤枠の項目をご確認ください。');
+      return;
+    }
+
     isSubmitting = true;
     els.send.disabled = true;
     const oldText = els.send.textContent;
+    const firstTitle = currentMode === 'inquiry' && selectedFiles.length ? '写真を安全に送信しています' : 'DPROへ送信しています';
+    const firstText = currentMode === 'inquiry' && selectedFiles.length
+      ? '写真のアップロード後、相談内容をDPROへ登録します。この画面を閉じずにお待ちください。'
+      : '予約内容をDPROへ登録しています。この画面を閉じずにお待ちください。';
+
     els.send.textContent = currentMode === 'inquiry' && selectedFiles.length ? '写真を送信中...' : 'DPROへ送信中...';
     resetResult();
+    els.result.className = 'api-result show sending';
+    els.resultTitle.textContent = firstTitle;
+    els.resultText.textContent = firstText;
+    setSubmittingState(true, firstTitle, firstText);
+    revealResult();
+    await nextPaint();
+
     try {
       const attachmentIds = await uploadPhotos();
       els.send.textContent = 'DPROへ登録中...';
+      setSubmittingState(true, 'DPROへ登録しています', '受付番号を発行し、店舗の管理画面へ登録しています。');
       const payload = buildPayload(attachmentIds);
       const endpoint = currentMode === 'inquiry' ? '/api/public/web-inquiries' : '/api/public/web-reservations';
       const result = await fetchJson(`${API_BASE}${endpoint}`, {
@@ -552,16 +613,21 @@
       complete(result);
       setApiState('connected', 'DPRO接続済み｜受付登録完了');
     } catch (error) {
+      setSubmittingState(false);
+      els.panel.classList.remove('completed');
       els.result.className = 'api-result show failure';
       els.resultTitle.textContent = 'DPROへ送信できませんでした';
       els.resultText.textContent = error.message || '通信状態を確認して再度お試しください。';
       setApiState('failed', 'DPRO送信エラー');
+      revealResult();
       showToast(error.message || '受付を送信できませんでした。');
     } finally {
       isSubmitting = false;
+      setSubmittingState(false);
       if (!completed) { els.send.disabled = false; els.send.textContent = oldText; }
     }
   };
+
 
   const receiptText = () => {
     if (!completionData) return '';
@@ -628,6 +694,7 @@
     els.uploadStatus.className = 'biz5-upload-status'; els.uploadStatus.textContent = '';
     storageRemove(DRAFT_KEY); resetRequestId();
     completed = false; completionData = null; resetResult();
+    els.form.setAttribute('aria-busy', 'false');
     els.send.disabled = false;
     els.send.textContent = 'DPROへ送信';
     fillServiceOptions(currentMode);
@@ -641,7 +708,7 @@
   els.service.addEventListener('change', () => { updateServiceDetail(); saveDraftSoon(); });
   els.reservationDate.addEventListener('change', loadSlots);
   els.photoInput.addEventListener('change', event => addPhotos(event.target.files));
-  els.next.addEventListener('click', () => { if (validateStep(currentStep)) showStep(currentStep + 1); });
+  els.next.addEventListener('click', () => { if (validateStep(currentStep)) showStep(currentStep + 1); else showToast('未入力または確認が必要な項目があります。赤枠の項目をご確認ください。'); });
   els.back.addEventListener('click', () => showStep(currentStep - 1));
   els.form.addEventListener('submit', submit);
   els.form.addEventListener('input', event => { event.target.setAttribute?.('aria-invalid', 'false'); saveDraftSoon(); });
@@ -660,6 +727,7 @@
     }
   };
 
+  console.info('WANGAN-BIZ-5-R4 submit feedback active');
   els.envChip.textContent = ENVIRONMENT === 'production' ? 'PRODUCTION' : 'DEMO';
   els.envChip.classList.toggle('production', ENVIRONMENT === 'production');
   populateYears(); renderPhotos(); resetTimeOptions();
