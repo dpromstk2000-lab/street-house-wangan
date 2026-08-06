@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>WANGAN-BIZ-7 RELEASE CHECK</title>
+  <title>WANGAN-BIZ-8 RELEASE CHECK</title>
   <style>
     :root{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;color:#e8edf2;background:#0b1117}
     *{box-sizing:border-box}body{margin:0;padding:30px}.wrap{max-width:1180px;margin:auto}
@@ -19,17 +19,17 @@
     code{white-space:pre-wrap;word-break:break-all;color:#cbd5e1}.links{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
     @media(max-width:760px){body{padding:18px}.summary{grid-template-columns:repeat(2,1fr)}.table-wrap{overflow:auto}}
   </style>
-  <script src="config.js"></script>
+  <script src="config.js?v=WANGAN-BIZ-8"></script>
 </head>
 <body>
 <div class="wrap">
   <small>INTERNAL RELEASE CHECK / OWNER非公開</small>
-  <h1>WANGAN-BIZ-7</h1>
-  <p class="lead">公開ページ、共通設定、SEO、主要ファイル、DPRO APIを一括確認します。このページはサイト来訪者へ案内しません。</p>
+  <h1>WANGAN-BIZ-8</h1>
+  <p class="lead">本番運用モード、テストデータ整理、料金設定、公開ページ、DPRO APIを一括確認します。検索公開は最終承認までOFFです。</p>
   <div class="links">
     <button id="run">一括検査を実行</button>
     <a class="btn" href="index.html">公開サイトへ</a>
-    <a class="btn" href="https://dpromstk2000-lab.github.io/line-shaken-liff/dashboard.html?ver=WANGAN-BIZ-7">DPRO管理画面へ</a>
+    <a class="btn" href="https://dpromstk2000-lab.github.io/line-shaken-liff/dashboard.html?ver=WANGAN-BIZ-8">DPRO管理画面へ</a>
   </div>
   <div class="summary">
     <div class="sum">合格<b id="okCount" class="ok">0</b></div>
@@ -91,16 +91,24 @@
     } catch (error) { add(file,required?'ng':'warn',error.message); }
   }
 
+  function readCleanupStatus() {
+    try { return JSON.parse(localStorage.getItem('wanganBiz8CleanupCompleted') || 'null'); }
+    catch (_) { return null; }
+  }
+
   async function run() {
     rows.length = 0;
     document.getElementById('results').innerHTML = '<tr><td colspan="3">検査中...</td></tr>';
 
-    add('config.version', /^WANGAN-BIZ-7/.test(C.version || '') ? 'ok' : 'ng', C.version || '未設定');
-    add('公開段階', C.searchIndexEnabled === true ? 'warn' : 'ok',
-      C.searchIndexEnabled === true ? '検索公開ONです。店舗承認済みか確認してください。' : '検索公開OFF（本番前として正常）');
+    add('config.version', /^WANGAN-BIZ-8/.test(C.version || '') ? 'ok' : 'ng', C.version || '未設定');
+    add('本番運用モード', C.environment === 'production' && C.releaseStage === 'ready' ? 'ok' : 'ng', `${C.environment || '未設定'} / ${C.releaseStage || '未設定'}`);
+    add('検索公開', C.searchIndexEnabled === false && C.goLiveApproved === false ? 'ok' : 'warn', C.searchIndexEnabled ? '検索公開ONです。最終承認済みか確認してください。' : '検索公開OFF（BIZ-8では正常）');
     add('LINE公式URL', C.defaultLineUrl ? 'ok' : 'warn', C.defaultLineUrl || '未設定のためLINE導線は非表示');
     add('公開環境表示', C.showPublicEnvironmentBadge === false ? 'ok' : 'warn', C.showPublicEnvironmentBadge === false ? 'お客様画面の環境バッジは非表示' : '環境バッジが公開表示されます');
     add('受付URL整理', C.stripTrackingFromOperationalRecords === true ? 'ok' : 'warn', C.stripTrackingFromOperationalRecords === true ? '運用記録から検査用クエリを除外' : '受付ページURLへクエリが残ります');
+
+    const cleanup = readCleanupStatus();
+    add('DPROテストデータ整理', cleanup?.ok === true ? 'ok' : 'warn', cleanup?.ok === true ? `整理済み：${cleanup.completedAt || ''} / 予約${cleanup.reservations || 0}件・相談${cleanup.inquiries || 0}件・顧客${cleanup.customers || 0}件` : 'DPRO管理画面上部の「本番前テスト整理」を実行してください');
 
     const pages = C.publicPages || ['index.html','services.html','maintenance.html','custom.html','pricing.html','works.html','about.html','contact.html','privacy.html'];
     for (const page of pages) await checkPage(page);
@@ -111,15 +119,29 @@
 
     try {
       const estimate = await fetchText(new URL('estimate.js', root));
-      const cleanSource = /sourcePage:[\s\S]{0,180}location\.pathname/.test(estimate.text) && /showPublicEnvironmentBadge/.test(estimate.text);
-      add('WEB受付運用情報', estimate.ok && cleanSource ? 'ok' : 'ng', estimate.ok && cleanSource ? '検査用URL除外・環境バッジ制御あり' : 'estimate.jsのBIZ7処理を確認してください');
+      const cleanSource = /sourcePage:[\s\S]{0,180}location\.pathname/.test(estimate.text) && /showPublicEnvironmentBadge/.test(estimate.text) && /wanganBiz8Draft/.test(estimate.text);
+      add('WEB受付運用情報', estimate.ok && cleanSource ? 'ok' : 'ng', estimate.ok && cleanSource ? 'BIZ-8入力保存・検査用URL除外・環境バッジ制御あり' : 'estimate.jsのBIZ-8処理を確認してください');
     } catch (error) { add('WEB受付運用情報','ng',error.message); }
 
     try {
-      const api = await fetchText(`${String(C.apiBase||'').replace(/\/+$/,'')}/health?step=WANGAN-BIZ-7-RELEASE-CHECK`);
+      const bootstrap = await fetchText(`${String(C.apiBase||'').replace(/\/+$/,'')}/api/public/site-bootstrap?shopCode=${encodeURIComponent(C.shopCode || '')}`);
+      const data = JSON.parse(bootstrap.text || '{}');
+      const services = Array.isArray(data.services) ? data.services.filter(s => s.isPublic !== false) : [];
+      const missingPrices = services.filter(s => (s.priceFrom === null || s.priceFrom === undefined || s.priceFrom === '') && !String(s.priceNote || '').trim());
+      add('公開サービス', bootstrap.ok && services.length ? 'ok' : 'ng', bootstrap.ok ? `${services.length}サービスを公開` : `HTTP ${bootstrap.status}`);
+      add('サービス料金目安', missingPrices.length ? 'warn' : 'ok', missingPrices.length ? `未設定 ${missingPrices.length}件：${missingPrices.map(s => s.name || s.code).join('、')}` : '全公開サービスに料金目安または料金説明あり');
+    } catch (error) {
+      add('公開サービス','ng',error.message);
+      add('サービス料金目安','warn','公開サービスを取得できないため未確認');
+    }
+
+    try {
+      const api = await fetchText(`${String(C.apiBase||'').replace(/\/+$/,'')}/health?step=WANGAN-BIZ-8-RELEASE-CHECK`);
       const data = JSON.parse(api.text || '{}');
       if (api.ok && data.ok === true && data.status === 'healthy') {
+        const switches = data.switches || {};
         add('DPRO Website API','ok',`${data.version || ''} / DB ${data.databaseVersion || ''}`);
+        add('WEB受付スイッチ', switches.booking && switches.provisional && switches.inquiry ? 'ok' : 'warn', `即時予約 ${switches.booking?'ON':'OFF'} / 仮予約 ${switches.provisional?'ON':'OFF'} / 写真相談 ${switches.inquiry?'ON':'OFF'}`);
       } else add('DPRO Website API','ng',api.text.slice(0,300));
     } catch (error) { add('DPRO Website API','ng',error.message); }
 

@@ -1,17 +1,17 @@
 /**
  * STREET HOUSE WANGAN Website Public Config
- * STEP WANGAN-BIZ-7
+ * STEP WANGAN-BIZ-8
  *
  * 公開してよい店舗情報だけを置きます。
  * Supabaseキー、Service Role、管理コード、秘密情報は置きません。
  *
- * 本番検索公開は searchIndexEnabled を true に変更するだけで切替できます。
- * 現在は店舗確認中のため false のままです。
+ * BIZ-8では本番運用モードへ切り替えますが、検索公開はまだOFFです。
+ * 最終承認後のSTEPで searchIndexEnabled と goLiveApproved をONにします。
  */
 window.DPRO_SITE_CONFIG = Object.freeze({
-  version: 'WANGAN-BIZ-7-SITE-20260806',
-  environment: 'staging',
-  releaseStage: 'prelaunch',
+  version: 'WANGAN-BIZ-8-SITE-20260806',
+  environment: 'production',
+  releaseStage: 'ready',
 
   apiBase: 'https://dpro-wangan-biz-api.dpromstk2000.workers.dev',
   shopCode: 'street_house_kitsuki',
@@ -19,6 +19,7 @@ window.DPRO_SITE_CONFIG = Object.freeze({
 
   siteBaseUrl: 'https://dpromstk2000-lab.github.io/street-house-wangan/',
   searchIndexEnabled: false,
+  goLiveApproved: false,
   showPublicEnvironmentBadge: false,
   stripTrackingFromOperationalRecords: true,
   schemaOpeningHours: '',
