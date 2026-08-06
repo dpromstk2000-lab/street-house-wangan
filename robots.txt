@@ -1,7 +1,3 @@
+# WANGAN-BIZ-8-R1 / 契約前・検索非公開
 User-agent: *
-Allow: /
-Disallow: /street-house-wangan/system-check.html
-Disallow: /street-house-wangan/system-check.js
-Disallow: /street-house-wangan/release-check.html
-
-Sitemap: https://dpromstk2000-lab.github.io/street-house-wangan/sitemap.xml
+Disallow: /street-house-wangan/

@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  // STEP WANGAN-BIZ-8: 本番公開前の受付情報整理・追跡URL分離
+  // STEP WANGAN-BIZ-8-R1: 本番公開前の受付情報整理・追跡URL分離
 
   const CONFIG = window.DPRO_SITE_CONFIG || {};
   const API_BASE = String(CONFIG.apiBase || 'https://dpro-wangan-biz-api.dpromstk2000.workers.dev').replace(/\/+$/, '');
@@ -9,8 +9,8 @@
   const ENVIRONMENT = String(CONFIG.environment || 'demo');
   const MAX_FILES = 5;
   const MAX_FILE_BYTES = 8 * 1024 * 1024;
-  const DRAFT_KEY = `wanganBiz8Draft:${SHOP_CODE}`;
-  const REQUEST_KEY = `wanganBiz8RequestId:${SHOP_CODE}`;
+  const DRAFT_KEY = `wanganBiz8R1Draft:${SHOP_CODE}`;
+  const REQUEST_KEY = `wanganBiz8R1RequestId:${SHOP_CODE}`;
 
   const modeInfo = {
     instant: {
@@ -812,7 +812,7 @@
     }
   };
 
-  console.info('WANGAN-BIZ-8 production-ready reception active');
+  console.info('WANGAN-BIZ-8-R1 proposal reception active / no search registration');
   if (els.envChip) {
     const showEnvironmentBadge = CONFIG.showPublicEnvironmentBadge === true;
     els.envChip.hidden = !showEnvironmentBadge;

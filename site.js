@@ -30,9 +30,11 @@
   }
 
   function applyPublicBusinessInfo(runtime = window.DPRO_RUNTIME || {}) {
-    const primaryPhone = String(runtime.phone || CONFIG.primaryPhone || CONFIG.defaultPhone || '');
+    const primaryPhone = String(CONFIG.primaryPhone || runtime.phone || CONFIG.defaultPhone || '');
     const fixedPhone = String(CONFIG.fixedPhone || '');
     const fullAddress = String(CONFIG.fullAddress || '');
+    const openingHours = String(CONFIG.openingHoursLabel || '');
+    const regularHoliday = String(CONFIG.regularHolidayLabel || '');
 
     if (fullAddress) {
       replaceExactText(document.body, '大分県杵築市大字守江1291-3', fullAddress);
@@ -75,6 +77,20 @@
         el.href = mapUrl;
         el.hidden = false;
       }
+    });
+
+
+    // 契約前の提案サイトでは、旧公式サイトで確認できた営業時間を静的正本として表示します。
+    document.querySelectorAll('[data-dpro-footer-hours]').forEach(el => {
+      if (openingHours) el.textContent = `${openingHours}${regularHoliday ? `／${regularHoliday}定休` : ''}`;
+    });
+
+    document.querySelectorAll('dt').forEach(dt => {
+      const label = (dt.textContent || '').trim();
+      const dd = dt.parentElement?.querySelector('dd');
+      if (!dd) return;
+      if (label === '営業時間' && openingHours) dd.textContent = openingHours;
+      if (label === '定休日' && regularHoliday) dd.textContent = regularHoliday;
     });
   }
 
@@ -135,6 +151,7 @@
 
     document.body.dataset.releaseStage = CONFIG.releaseStage || 'staging';
     document.body.dataset.environment = CONFIG.environment || 'demo';
+    document.body.dataset.contractStatus = CONFIG.contractStatus || 'unknown';
   }
 
   function applyNavigationAccessibility() {
@@ -235,6 +252,7 @@
       const runtime = event.detail || window.DPRO_RUNTIME || {};
       setTimeout(() => applyAll(runtime), 0);
       setTimeout(() => applyAll(runtime), 250);
+      setTimeout(() => applyAll(runtime), 800);
     }, { passive: true });
   });
 

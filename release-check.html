@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>WANGAN-BIZ-8 RELEASE CHECK</title>
+  <title>WANGAN-BIZ-8-R1 RELEASE CHECK</title>
   <style>
     :root{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;color:#e8edf2;background:#0b1117}
     *{box-sizing:border-box}body{margin:0;padding:30px}.wrap{max-width:1180px;margin:auto}
@@ -19,17 +19,17 @@
     code{white-space:pre-wrap;word-break:break-all;color:#cbd5e1}.links{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
     @media(max-width:760px){body{padding:18px}.summary{grid-template-columns:repeat(2,1fr)}.table-wrap{overflow:auto}}
   </style>
-  <script src="config.js?v=WANGAN-BIZ-8"></script>
+  <script src="config.js?v=WANGAN-BIZ-8-R1"></script>
 </head>
 <body>
 <div class="wrap">
   <small>INTERNAL RELEASE CHECK / OWNER非公開</small>
-  <h1>WANGAN-BIZ-8</h1>
-  <p class="lead">本番運用モード、テストデータ整理、料金設定、公開ページ、DPRO APIを一括確認します。検索公開は最終承認までOFFです。</p>
+  <h1>WANGAN-BIZ-8-R1</h1>
+  <p class="lead">契約前の提案状態、検索非公開、店舗情報、料金設定、公開ページ、DPRO APIを一括確認します。</p>
   <div class="links">
     <button id="run">一括検査を実行</button>
     <a class="btn" href="index.html">公開サイトへ</a>
-    <a class="btn" href="https://dpromstk2000-lab.github.io/line-shaken-liff/dashboard.html?ver=WANGAN-BIZ-8">DPRO管理画面へ</a>
+    <a class="btn" href="https://dpromstk2000-lab.github.io/line-shaken-liff/dashboard.html?ver=WANGAN-BIZ-8-R1">DPRO管理画面へ</a>
   </div>
   <div class="summary">
     <div class="sum">合格<b id="okCount" class="ok">0</b></div>
@@ -100,12 +100,14 @@
     rows.length = 0;
     document.getElementById('results').innerHTML = '<tr><td colspan="3">検査中...</td></tr>';
 
-    add('config.version', /^WANGAN-BIZ-8/.test(C.version || '') ? 'ok' : 'ng', C.version || '未設定');
-    add('本番運用モード', C.environment === 'production' && C.releaseStage === 'ready' ? 'ok' : 'ng', `${C.environment || '未設定'} / ${C.releaseStage || '未設定'}`);
-    add('検索公開', C.searchIndexEnabled === false && C.goLiveApproved === false ? 'ok' : 'warn', C.searchIndexEnabled ? '検索公開ONです。最終承認済みか確認してください。' : '検索公開OFF（BIZ-8では正常）');
+    add('config.version', /^WANGAN-BIZ-8-R1/.test(C.version || '') ? 'ok' : 'ng', C.version || '未設定');
+    add('契約前提案モード', C.environment === 'staging' && C.releaseStage === 'proposal' && C.contractStatus === 'not_contracted' ? 'ok' : 'ng', `${C.environment || '未設定'} / ${C.releaseStage || '未設定'} / ${C.contractStatus || '未設定'}`);
+    add('検索・登録停止', C.searchIndexEnabled === false && C.goLiveApproved === false && C.searchEngineRegistrationEnabled === false && C.sitemapSubmissionEnabled === false ? 'ok' : 'ng', C.searchIndexEnabled ? '検索公開ONです' : 'noindex・検索登録OFF・サイトマップ送信OFF');
     add('LINE公式URL', C.defaultLineUrl ? 'ok' : 'warn', C.defaultLineUrl || '未設定のためLINE導線は非表示');
     add('公開環境表示', C.showPublicEnvironmentBadge === false ? 'ok' : 'warn', C.showPublicEnvironmentBadge === false ? 'お客様画面の環境バッジは非表示' : '環境バッジが公開表示されます');
     add('受付URL整理', C.stripTrackingFromOperationalRecords === true ? 'ok' : 'warn', C.stripTrackingFromOperationalRecords === true ? '運用記録から検査用クエリを除外' : '受付ページURLへクエリが残ります');
+    add('店舗営業時間', C.openingHoursLabel === '月・火・水・金・土 9:00〜19:00／日曜・祝日 9:00〜18:00' && C.regularHolidayLabel === '木曜日' ? 'ok' : 'ng', `${C.openingHoursLabel || '未設定'} / ${C.regularHolidayLabel || '未設定'}定休`);
+    add('電話番号', C.primaryPhone === '080-5241-0066' && C.fixedPhone === '0978-63-8706' ? 'ok' : 'warn', `携帯 ${C.primaryPhone || '未設定'} / 固定 ${C.fixedPhone || '未設定'}`);
 
     const cleanup = readCleanupStatus();
     add('DPROテストデータ整理', cleanup?.ok === true ? 'ok' : 'warn', cleanup?.ok === true ? `整理済み：${cleanup.completedAt || ''} / 予約${cleanup.reservations || 0}件・相談${cleanup.inquiries || 0}件・顧客${cleanup.customers || 0}件` : 'DPRO管理画面上部の「本番前テスト整理」を実行してください');
@@ -117,10 +119,22 @@
       await checkAsset(asset, asset !== 'estimate.js' || pages.includes('contact.html'));
     }
 
+
+    try {
+      const robots = await fetchText(new URL('robots.txt', root));
+      add('robots検索遮断', robots.ok && /Disallow:\s*\/street-house-wangan\//.test(robots.text) && !/Sitemap:/i.test(robots.text) ? 'ok' : 'ng', robots.ok ? '契約前の検索クロール案内を停止' : `HTTP ${robots.status}`);
+      const sitemap = await fetchText(new URL('sitemap.xml', root));
+      const hasLoc = /<loc>/i.test(sitemap.text);
+      add('サイトマップ未公開', sitemap.ok && !hasLoc ? 'ok' : 'ng', sitemap.ok && !hasLoc ? '契約前のため公開URL 0件' : 'URLが掲載されています');
+    } catch (error) {
+      add('robots検索遮断','ng',error.message);
+      add('サイトマップ未公開','ng',error.message);
+    }
+
     try {
       const estimate = await fetchText(new URL('estimate.js', root));
-      const cleanSource = /sourcePage:[\s\S]{0,180}location\.pathname/.test(estimate.text) && /showPublicEnvironmentBadge/.test(estimate.text) && /wanganBiz8Draft/.test(estimate.text);
-      add('WEB受付運用情報', estimate.ok && cleanSource ? 'ok' : 'ng', estimate.ok && cleanSource ? 'BIZ-8入力保存・検査用URL除外・環境バッジ制御あり' : 'estimate.jsのBIZ-8処理を確認してください');
+      const cleanSource = /sourcePage:[\s\S]{0,180}location\.pathname/.test(estimate.text) && /showPublicEnvironmentBadge/.test(estimate.text) && /wanganBiz8R1Draft/.test(estimate.text);
+      add('WEB受付運用情報', estimate.ok && cleanSource ? 'ok' : 'ng', estimate.ok && cleanSource ? 'BIZ-8-R1入力保存・検査用URL除外・環境バッジ制御あり' : 'estimate.jsのBIZ-8処理を確認してください');
     } catch (error) { add('WEB受付運用情報','ng',error.message); }
 
     try {
@@ -136,7 +150,7 @@
     }
 
     try {
-      const api = await fetchText(`${String(C.apiBase||'').replace(/\/+$/,'')}/health?step=WANGAN-BIZ-8-RELEASE-CHECK`);
+      const api = await fetchText(`${String(C.apiBase||'').replace(/\/+$/,'')}/health?step=WANGAN-BIZ-8-R1-RELEASE-CHECK`);
       const data = JSON.parse(api.text || '{}');
       if (api.ok && data.ok === true && data.status === 'healthy') {
         const switches = data.switches || {};

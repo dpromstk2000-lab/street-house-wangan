@@ -1,17 +1,16 @@
 /**
  * STREET HOUSE WANGAN Website Public Config
- * STEP WANGAN-BIZ-8
+ * STEP WANGAN-BIZ-8-R1
  *
- * 公開してよい店舗情報だけを置きます。
+ * 契約前の提案確認用サイトです。
+ * 検索エンジン登録・サイトマップ送信・正式公開は行いません。
  * Supabaseキー、Service Role、管理コード、秘密情報は置きません。
- *
- * BIZ-8では本番運用モードへ切り替えますが、検索公開はまだOFFです。
- * 最終承認後のSTEPで searchIndexEnabled と goLiveApproved をONにします。
  */
 window.DPRO_SITE_CONFIG = Object.freeze({
-  version: 'WANGAN-BIZ-8-SITE-20260806',
-  environment: 'production',
-  releaseStage: 'ready',
+  version: 'WANGAN-BIZ-8-R1-SITE-20260806',
+  environment: 'staging',
+  releaseStage: 'proposal',
+  contractStatus: 'not_contracted',
 
   apiBase: 'https://dpro-wangan-biz-api.dpromstk2000.workers.dev',
   shopCode: 'street_house_kitsuki',
@@ -20,13 +19,19 @@ window.DPRO_SITE_CONFIG = Object.freeze({
   siteBaseUrl: 'https://dpromstk2000-lab.github.io/street-house-wangan/',
   searchIndexEnabled: false,
   goLiveApproved: false,
+  searchEngineRegistrationEnabled: false,
+  sitemapSubmissionEnabled: false,
   showPublicEnvironmentBadge: false,
   stripTrackingFromOperationalRecords: true,
-  schemaOpeningHours: '',
+  schemaOpeningHours: Object.freeze([
+    'Mo,Tu,We,Fr,Sa 09:00-19:00',
+    'Su 09:00-18:00'
+  ]),
   ogImage: 'ogp.jpg',
 
   shopName: 'ストリートハウス湾岸通り',
   shopNameEnglish: 'STREET HOUSE WANGAN',
+  businessCategoryLabel: '自動車修理・チューニング・自動車販売',
   defaultPhone: '080-5241-0066',
   primaryPhone: '080-5241-0066',
   fixedPhone: '0978-63-8706',
@@ -37,8 +42,9 @@ window.DPRO_SITE_CONFIG = Object.freeze({
   streetAddress: '大字守江1291-3',
   fullAddress: '大分県杵築市大字守江1291-3',
 
-  openingHoursLabel: '9:00〜19:00',
-  emergencyHoursLabel: '夜間・休日は緊急時応相談',
+  openingHoursLabel: '月・火・水・金・土 9:00〜19:00／日曜・祝日 9:00〜18:00',
+  regularHolidayLabel: '木曜日',
+  emergencyHoursLabel: '',
 
   defaultLineUrl: '',
   defaultMapUrl: 'https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E5%88%86%E7%9C%8C%E6%9D%B5%E7%AF%89%E5%B8%82%E5%A4%A7%E5%AD%97%E5%AE%88%E6%B1%9F1291-3',
@@ -57,5 +63,5 @@ window.DPRO_SITE_CONFIG = Object.freeze({
 
   cacheMinutes: 5,
   source: 'WEB',
-  sourceDetail: 'street-house-wangan-business'
+  sourceDetail: 'street-house-wangan-business-proposal'
 });
