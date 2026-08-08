@@ -43,7 +43,7 @@
     mount.className = 'dpro-global-status is-loading';
     mount.setAttribute('role', 'status');
     mount.setAttribute('aria-live', 'polite');
-    mount.innerHTML = '<div class="dpro-global-status-inner"><span class="dpro-status-dot"></span><b>DPRO営業情報を確認中</b><span>営業時間・休業日を読み込んでいます。</span></div>';
+    mount.innerHTML = '<div class="dpro-global-status-inner"><span class="dpro-status-dot"></span><b>営業情報を確認中</b><span>営業時間・休業日を読み込んでいます。</span></div>';
     header.insertAdjacentElement('afterend', mount);
     return mount;
   }
@@ -151,7 +151,7 @@
     const hours = status.openTime && status.closeTime ? `${formatTime(status.openTime)}〜${formatTime(status.closeTime)}` : '';
     mount.className = `dpro-global-status ${open ? 'is-open' : closed ? 'is-closed' : 'is-unknown'}`;
     const main = open ? `本日は営業日です${hours ? `　${hours}` : ''}` : closed ? '本日は休業日です' : '本日の営業情報をご確認ください';
-    const sub = closed && status.reason ? status.reason : status.nextClosedDate ? `次の休業日：${formatDate(status.nextClosedDate)}${status.nextClosedReason ? `（${status.nextClosedReason}）` : ''}` : '営業日・空き状況はDPROから自動反映しています。';
+    const sub = closed && status.reason ? status.reason : status.nextClosedDate ? `次の休業日：${formatDate(status.nextClosedDate)}${status.nextClosedReason ? `（${status.nextClosedReason}）` : ''}` : '営業日・空き状況は最新情報を自動反映しています。';
     mount.innerHTML = `<div class="dpro-global-status-inner"><span class="dpro-status-dot"></span><b>${escapeHtml(main)}</b><span>${escapeHtml(sub)}</span><a href="about.html#business-calendar">営業カレンダー</a></div>`;
   }
 
@@ -162,7 +162,7 @@
       mount.innerHTML = `<div class="dpro-global-status-inner"><span class="dpro-status-dot"></span><b>営業情報を取得できませんでした</b><span>お急ぎの場合はお電話でご確認ください。</span><a href="${normalizePhoneHref(CONFIG.defaultPhone)}">${escapeHtml(CONFIG.defaultPhone)}</a></div>`;
     }
     document.querySelectorAll('[data-dpro-loading]').forEach(el => {
-      el.innerHTML = `<div class="dpro-empty"><b>DPRO情報を取得できませんでした。</b><span>ページの基本情報はそのままご覧いただけます。時間を置いて再度お試しください。</span></div>`;
+      el.innerHTML = `<div class="dpro-empty"><b>最新情報を取得できませんでした。</b><span>ページの基本情報はそのままご覧いただけます。時間を置いて再度お試しください。</span></div>`;
     });
     console.warn('WANGAN-BIZ-4 bootstrap failed', error);
   }
@@ -213,7 +213,7 @@
         mount.innerHTML = '<div class="dpro-empty"><b>現在公開中のサービスはありません。</b><span>詳しくは店舗へお問い合わせください。</span></div>';
         return;
       }
-      mount.innerHTML = `<div class="dpro-service-grid">${services.map(serviceCard).join('')}</div><p class="dpro-sync-note">この一覧はDPROオーナー画面の公開設定・料金・所要時間と連動しています。</p>`;
+      mount.innerHTML = `<div class="dpro-service-grid">${services.map(serviceCard).join('')}</div><p class="dpro-sync-note">料金・所要時間・受付状況は最新の店舗情報を反映しています。</p>`;
     });
   }
 
@@ -227,7 +227,7 @@
       const notices = Array.isArray(data.notices) ? data.notices : [];
       const limit = Number(mount.dataset.limit || 0);
       const rows = limit > 0 ? notices.slice(0, limit) : notices;
-      mount.innerHTML = rows.length ? `<div class="dpro-notice-list">${rows.map(noticeCard).join('')}</div>` : '<div class="dpro-empty compact"><b>現在、臨時のお知らせはありません。</b><span>休日・営業時間変更をDPROで登録すると、ここへ自動反映されます。</span></div>';
+      mount.innerHTML = rows.length ? `<div class="dpro-notice-list">${rows.map(noticeCard).join('')}</div>` : '<div class="dpro-empty compact"><b>現在、臨時のお知らせはありません。</b><span>営業時間や休業日の変更がある場合は、こちらでお知らせします。</span></div>';
     });
   }
 
@@ -257,7 +257,7 @@
         const mode = serviceMode(s);
         const price = formatMoney(s.priceFrom) || s.priceNote || '内容確認後';
         return `<div class="dpro-price-row"><div><span class="dpro-mode ${mode.tone}">${mode.label}</span><b>${escapeHtml(s.name)}</b><small>${escapeHtml(s.summary || '')}</small></div><div><strong>${escapeHtml(price)}</strong><span>${s.durationMinutes ? `目安 ${Number(s.durationMinutes)}分` : '日時指定なし'}</span></div></div>`;
-      }).join('')}</div><p class="dpro-sync-note">料金・所要時間はDPROの公開設定から取得しています。車種・状態・部品により正式見積もりは変わります。</p>` : '<div class="dpro-empty">公開料金を準備中です。</div>';
+      }).join('')}</div><p class="dpro-sync-note">料金・所要時間は最新の公開情報です。車種・状態・部品により正式なお見積もりは変わる場合があります。</p>` : '<div class="dpro-empty">公開料金を準備中です。</div>';
     });
   }
 
@@ -274,7 +274,7 @@
         const reason = day.reason || (isOpen ? '営業日' : '休業日');
         return `<article class="dpro-calendar-day ${isOpen ? 'open' : 'closed'}"><time datetime="${escapeHtml(day.date)}">${escapeHtml(formatDate(day.date))}</time><b>${isOpen ? '営業' : '休業'}</b><span>${escapeHtml(hours || reason)}</span></article>`;
       });
-      mount.innerHTML = `<div class="dpro-calendar-legend"><span><i class="open"></i>営業日</span><span><i class="closed"></i>休業日・臨時休業</span></div><div class="dpro-calendar-grid">${rows.join('')}</div><p class="dpro-sync-note">オーナー画面で定休日・臨時休業・特別営業を変更すると、このカレンダーへ自動反映されます。</p>`;
+      mount.innerHTML = `<div class="dpro-calendar-legend"><span><i class="open"></i>営業日</span><span><i class="closed"></i>休業日・臨時休業</span></div><div class="dpro-calendar-grid">${rows.join('')}</div><p class="dpro-sync-note">定休日・臨時休業・特別営業など、最新の営業予定を表示しています。</p>`;
     });
   }
 
@@ -286,7 +286,7 @@
         ['WEB仮予約', Boolean(ws.website_provisional_enabled)],
         ['写真・見積もり相談', Boolean(ws.website_inquiry_enabled)]
       ];
-      mount.innerHTML = `<div class="dpro-contact-state"><div><span class="eyebrow">DPRO LIVE STATUS</span><h2>ホームページ受付状況</h2><p>オーナー画面の受付スイッチと連動しています。</p></div><div class="dpro-switch-list">${switches.map(([label,on]) => `<div class="${on ? 'on' : 'off'}"><span>${escapeHtml(label)}</span><b>${on ? '受付中' : '準備中'}</b></div>`).join('')}</div><div class="dpro-contact-actions"><a class="btn btn-primary" href="${normalizePhoneHref(runtime.phone)}">電話で相談</a>${runtime.lineUrl ? `<a class="btn btn-outline" href="${escapeHtml(runtime.lineUrl)}" target="_blank" rel="noopener">LINEで相談</a>` : ''}</div></div>`;
+      mount.innerHTML = `<div class="dpro-contact-state"><div><span class="eyebrow">ONLINE RECEPTION</span><h2>ホームページ受付状況</h2><p>現在ご利用いただける受付方法をご案内します。</p></div><div class="dpro-switch-list">${switches.map(([label,on]) => `<div class="${on ? 'on' : 'off'}"><span>${escapeHtml(label)}</span><b>${on ? '受付中' : '準備中'}</b></div>`).join('')}</div><div class="dpro-contact-actions"><a class="btn btn-primary" href="${normalizePhoneHref(runtime.phone)}">電話で相談</a>${runtime.lineUrl ? `<a class="btn btn-outline" href="${escapeHtml(runtime.lineUrl)}" target="_blank" rel="noopener">LINEで相談</a>` : ''}</div></div>`;
     });
   }
 
