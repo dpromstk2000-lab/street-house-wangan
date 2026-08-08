@@ -79,4 +79,16 @@ window.DPRO_SITE_CONFIG = Object.freeze({
   source: 'WEB',
   sourceDetail: 'street-house-wangan-r3-store-info-and-responsive-audit'
 });
+
+// Global Japanese heading line-break audit for all public pages.
+(() => {
+  if (document.getElementById('wanganHeadingFixScript')) return;
+  const current = document.currentScript;
+  const base = current?.src ? new URL('.', current.src) : new URL('.', location.href);
+  const script = document.createElement('script');
+  script.id = 'wanganHeadingFixScript';
+  script.src = new URL('heading-fix.js?v=WANGAN-LINEBREAK-20260808-1', base).href;
+  document.head.appendChild(script);
+})();
+
 // DEPLOY-RETRY-20260807-0941
