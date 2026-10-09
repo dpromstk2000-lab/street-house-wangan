@@ -7,6 +7,7 @@
   const API_BASE = String(CONFIG.apiBase || 'https://dpro-wangan-biz-api.dpromstk2000.workers.dev').replace(/\/+$/, '');
   const SHOP_CODE = String(CONFIG.shopCode || 'street_house_kitsuki');
   const ENVIRONMENT = String(CONFIG.environment || 'demo');
+  const LIVE_RECEPTION_ENABLED = ENVIRONMENT === 'production' && CONFIG.releaseStage === 'released' && CONFIG.contractStatus === 'contracted' && CONFIG.goLiveApproved === true && CONFIG.enableLiveWebReception === true;
   const MAX_FILES = 5;
   const MAX_FILE_BYTES = 8 * 1024 * 1024;
   const DRAFT_KEY = `wanganBiz8R3Draft:${SHOP_CODE}`;
@@ -174,7 +175,7 @@
       bootstrap = await fetchJson(`${API_BASE}/api/public/site-bootstrap?shopCode=${encodeURIComponent(SHOP_CODE)}`, { headers: { Accept: 'application/json' } });
       services = Array.isArray(bootstrap.services) ? bootstrap.services : [];
       setModeCards();
-      setApiState('connected', `DPRO接続済み｜${services.filter(s => s.availableForWebsite).length}サービス受付中`);
+      setApiState('connected', LIVE_RECEPTION_ENABLED ? `DPRO接続済み｜${services.filter(s => s.availableForWebsite).length}サービス受付中` : '制作サンプル｜送信・入力保存なし');
       maybeOpenFromUrl();
     } catch (error) {
       setApiState('failed', 'DPRO受付情報を取得できません');
@@ -387,7 +388,7 @@
     });
     els.back.hidden = currentStep === 1 || completed;
     els.next.hidden = currentStep === 4 || completed;
-    els.send.hidden = currentStep !== 4 || completed;
+    els.send.hidden = currentStep !== 4 || completed || !LIVE_RECEPTION_ENABLED;
     els.clear.hidden = completed;
     els.successPhone.hidden = !completed;
     els.receipt.hidden = !completed;
@@ -528,6 +529,7 @@
   };
 
   const uploadPhotos = async () => {
+    if (!LIVE_RECEPTION_ENABLED) throw new Error('制作サンプルでは写真の送信を行いません。');
     if (currentMode !== 'inquiry' || !selectedFiles.length) return [];
     const ids = [];
     for (let index = 0; index < selectedFiles.length; index += 1) {
@@ -634,6 +636,11 @@
 
   const submit = async event => {
     event.preventDefault();
+    // Proposal display-only: no POST or uploads (server-side policy still required).
+    if (!LIVE_RECEPTION_ENABLED) {
+      showToast('制作サンプルのため予約・相談は送信しません。個人情報を入力しないでください。');
+      return;
+    }
     if (isSubmitting) {
       showToast('現在送信中です。完了するまでそのままお待ちください。');
       return;
@@ -745,6 +752,11 @@
   };
 
   const saveDraftSoon = () => {
+    if (!LIVE_RECEPTION_ENABLED) {
+      clearTimeout(draftTimer);
+      els.draftStatus.textContent = '制作サンプル：端末への入力保存は行いません';
+      return;
+    }
     clearTimeout(draftTimer);
     draftTimer = setTimeout(() => {
       if (completed) return;
@@ -753,6 +765,11 @@
   };
 
   const restoreDraft = () => {
+    if (!LIVE_RECEPTION_ENABLED) {
+      storageRemove(DRAFT_KEY); storageRemove(REQUEST_KEY);
+      els.draftStatus.textContent = '制作サンプル：入力内容は保存されません';
+      return;
+    }
     try {
       const draft = JSON.parse(storageGet(DRAFT_KEY) || 'null');
       if (!draft || Date.now() - Number(draft.savedAt || 0) > 7 * 24 * 60 * 60 * 1000) return;

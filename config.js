@@ -11,6 +11,7 @@ window.DPRO_SITE_CONFIG = Object.freeze({
   environment: 'staging',
   releaseStage: 'proposal',
   contractStatus: 'not_contracted',
+  enableLiveWebReception: false,
 
   apiBase: 'https://dpro-wangan-biz-api.dpromstk2000.workers.dev',
   shopCode: 'street_house_kitsuki',
