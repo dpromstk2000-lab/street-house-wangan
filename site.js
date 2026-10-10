@@ -2,6 +2,29 @@
   'use strict';
 
   const CONFIG = window.DPRO_SITE_CONFIG || {};
+
+  // R30: explicit proposal notice. Visual guidance only; R29 submission guards remain unchanged.
+  const R30_PROPOSAL_PREVIEW = CONFIG.environment !== 'production' ||
+    CONFIG.releaseStage !== 'released' ||
+    CONFIG.contractStatus !== 'contracted' ||
+    CONFIG.goLiveApproved !== true ||
+    CONFIG.enableLiveWebReception !== true;
+  if (R30_PROPOSAL_PREVIEW) {
+    const showR30ProposalNotice = () => {
+      if (!document.body || document.getElementById('dpro-proposal-notice-r30')) return;
+      const notice = document.createElement('div');
+      notice.id = 'dpro-proposal-notice-r30';
+      notice.setAttribute('role', 'status');
+      notice.textContent = '【制作サンプル】予約・相談・写真の受付送信は停止中です。実際の個人情報は入力しないでください。';
+      notice.style.cssText = 'box-sizing:border-box;width:100%;padding:10px 16px;background:#fff1d3;color:#633509;text-align:center;font:700 14px/1.55 system-ui,-apple-system,sans-serif;border-bottom:2px solid #d89a36;';
+      document.body.insertBefore(notice, document.body.firstChild);
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', showR30ProposalNotice, { once: true });
+    } else {
+      showR30ProposalNotice();
+    }
+  }
   const ROOT = String(CONFIG.siteBaseUrl || 'https://dpromstk2000-lab.github.io/street-house-wangan/')
     .replace(/\/?$/, '/');
 
