@@ -16,8 +16,19 @@
       notice.id = 'dpro-proposal-notice-r30';
       notice.setAttribute('role', 'status');
       notice.textContent = '【制作サンプル】予約・相談・写真の受付送信は停止中です。実際の個人情報は入力しないでください。';
-      notice.style.cssText = 'box-sizing:border-box;width:100%;padding:10px 16px;background:#fff1d3;color:#633509;text-align:center;font:700 14px/1.55 system-ui,-apple-system,sans-serif;border-bottom:2px solid #d89a36;';
-      document.body.insertBefore(notice, document.body.firstChild);
+      notice.style.cssText = 'box-sizing:border-box;position:fixed;left:0;right:0;top:74px;z-index:99;width:100%;padding:10px 16px;background:#fff1d3;color:#633509;text-align:center;font:700 14px/1.55 system-ui,-apple-system,sans-serif;border-bottom:2px solid #d89a36;';
+      const header = document.querySelector('.header');
+      if (header) header.insertAdjacentElement('afterend', notice);
+      else document.body.insertBefore(notice, document.body.firstChild);
+      const positionNotice = () => {
+        const headerHeight = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
+        notice.style.top = headerHeight + 'px';
+        const noticeHeight = Math.ceil(notice.getBoundingClientRect().height);
+        document.body.style.paddingTop = noticeHeight + 'px';
+        document.documentElement.style.scrollPaddingTop = (headerHeight + noticeHeight + 12) + 'px';
+      };
+      positionNotice();
+      window.addEventListener('resize', positionNotice, { passive: true });
     };
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', showR30ProposalNotice, { once: true });
